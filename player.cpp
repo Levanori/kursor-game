@@ -97,6 +97,29 @@ void Player::render(QPainter& painter)
         painter.setPen(Qt::NoPen);
         painter.drawEllipse(getAttackBounds());
     }
+
+    // Прогрес-бар cooldown'у атаки (над курсором)
+    if (attackCooldown > 0) {
+        double cooldownPercent = 1.0 - (attackCooldown / attackCooldownTime);
+        double barWidth = 24;
+        double barHeight = 4;
+        double barX = position.x() + (size.width() - barWidth) / 2;
+        double barY = position.y() - 10;
+
+        // Фон (сірий)
+        painter.setBrush(QColor(60, 60, 60));
+        painter.setPen(Qt::NoPen);
+        painter.drawRect(QRectF(barX, barY, barWidth, barHeight));
+
+        // Заповнення (жовтий/помаранчевий)
+        painter.setBrush(QColor(255, 180, 0));
+        painter.drawRect(QRectF(barX, barY, barWidth * cooldownPercent, barHeight));
+
+        // Рамка
+        painter.setPen(QPen(Qt::black, 1));
+        painter.setBrush(Qt::NoBrush);
+        painter.drawRect(QRectF(barX, barY, barWidth, barHeight));
+    }
 }
 
 void Player::setKeyPressed(int key, bool pressed)
