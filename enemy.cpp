@@ -24,6 +24,11 @@ void Enemy::update(double deltaTime)
 {
     if (isDead()) return;
 
+    // Оновлення cooldown на отримання шкоди
+    if (hitCooldown > 0) {
+        hitCooldown -= deltaTime;
+    }
+
     // Обробка knockback
     if (knockbackTimer > 0) {
         knockbackTimer -= deltaTime;
@@ -77,7 +82,10 @@ QRectF Enemy::getBounds() const
 
 void Enemy::takeDamage(int amount)
 {
+    if (hitCooldown > 0) return; // Захист від мульти-ударів
+
     health -= amount;
+    hitCooldown = hitCooldownTime;
 }
 
 void Enemy::knockback(QPointF fromPos, double force)

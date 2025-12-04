@@ -20,6 +20,7 @@ public:
     int getDamage() const { return contactDamage; }
     int getHealth() const { return health; }
     bool isDead() const { return health <= 0; }
+    bool canBeHit() const { return hitCooldown <= 0; }
 
     // Колізії
     QRectF getBounds() const;
@@ -32,13 +33,17 @@ private:
     QPointF* targetPosition = nullptr;
 
     // Характеристики
-    int health = 30;
-    int maxHealth = 30;
+    int health = 50;
+    int maxHealth = 50;
     int contactDamage = 20;
 
     // Knockback
     QPointF knockbackVelocity;
     double knockbackTimer = 0;
+
+    // Захист від мульти-ударів
+    double hitCooldown = 0;
+    double hitCooldownTime = 0.4; // мінімальний час між ударами
 };
 
 #endif // ENEMY_H
