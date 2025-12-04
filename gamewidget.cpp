@@ -2,11 +2,12 @@
 
 GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
 {
+    setFixedSize(800, 600);
     game.initialize();
 
-    setFocusPolicy(Qt::StrongFocus); // можливість використовувати клавіші не для вводу
+    setFocusPolicy(Qt::StrongFocus);
 
-    gameTimerId = startTimer(16);
+    gameTimerId = startTimer(16); // ~60 FPS
 
     elapsedTimer.start();
     lastFrameTime = 0;
@@ -14,16 +15,22 @@ GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
 
 void GameWidget::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     QPainter painter(this);
 
-    painter.fillRect(rect(), QColor(90, 50, 40)); // заповнення всієї сцени
+    // Фон робочого столу
+    QLinearGradient gradient(0, 0, 0, height());
+    gradient.setColorAt(0, QColor(0, 120, 215));
+    gradient.setColorAt(1, QColor(0, 80, 150));
+    painter.fillRect(rect(), gradient);
+
     game.render(painter);
 }
 
-void GameWidget::timerEvent(QTimerEvent *event) // функція для покадрового перемалювання(оновлення станів об'єктів)
+void GameWidget::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == gameTimerId) {
-        long long currentTime = elapsedTimer.nsecsElapsed();  // використання бібліотеки qt для отримання всього часу гри
+        long long currentTime = elapsedTimer.nsecsElapsed();
         double deltaTime = (currentTime - lastFrameTime) / 1000000000.0;
         lastFrameTime = currentTime;
         game.update(deltaTime);
@@ -33,6 +40,16 @@ void GameWidget::timerEvent(QTimerEvent *event) // функція для пок�
 
 void GameWidget::keyPressEvent(QKeyEvent *event)
 {
-    game.handleKeyPress(event->key());
+    if (!event->isAutoRepeat()) {
+        game.handleKeyPress(event->key());
+    }
     QWidget::keyPressEvent(event);
+}
+
+void GameWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    if (!event->isAutoRepeat()) {
+        game.handleKeyRelease(event->key());
+    }
+    QWidget::keyReleaseEvent(event);
 }

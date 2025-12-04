@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    enemy.cpp \
     game.cpp \
     gameobject.cpp \
     gamewidget.cpp \
@@ -18,12 +19,16 @@ SOURCES += \
     testobject.cpp
 
 HEADERS += \
+    enemy.h \
     game.h \
     gameobject.h \
     gamewidget.h \
     level.h \
     player.h \
     testobject.h
+
+RESOURCES += \
+    resources.qrc
 
 FORMS +=
 

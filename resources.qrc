@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/sprites">
+        <file>assets/cursor.svg</file>
+        <file>assets/virus.svg</file>
+    </qresource>
+</RCC>

@@ -13,9 +13,10 @@ public:
     GameWidget(QWidget *parent = nullptr);
 
 protected:
-    void paintEvent(QPaintEvent *event) override; // метод відображення
-    void timerEvent(QTimerEvent *event) override; // метод подій за часом
+    void paintEvent(QPaintEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 private:
     Game game;

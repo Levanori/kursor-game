@@ -14,6 +14,7 @@ public:
     void update(double deltaTime);
     void render(QPainter& painter);
     void handleKeyPress(int key);
+    void handleKeyRelease(int key);
 
 private:
     Level* currentLevel;
