@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QElapsedTimer>
+#include <QPixmap>
 #include "game.h"
 
 class GameWidget : public QWidget
@@ -24,6 +25,8 @@ private:
 
     QElapsedTimer elapsedTimer;
     long long lastFrameTime;
+
+    QPixmap backgroundImage;
 };
 
 #endif // GAMEWIDGET_H

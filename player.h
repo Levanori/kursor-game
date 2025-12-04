@@ -3,6 +3,7 @@
 
 #include "gameobject.h"
 #include <QPixmap>
+#include <QVector>
 #include <QSet>
 
 class Player : public GameObject
@@ -36,7 +37,10 @@ public:
     QPointF* getPositionPtr() { return &position; }
 
 private:
+    void updateSprite(); // Оновлення спрайту залежно від HP
+
     QPixmap sprite;
+    QVector<QPixmap> cursorSprites; // 5 станів: 100, 80, 60, 40, 20 HP
     QSet<int> pressedKeys;
 
     // Здоров'я

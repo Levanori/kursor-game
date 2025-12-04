@@ -7,6 +7,9 @@ GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
 
     setFocusPolicy(Qt::StrongFocus);
 
+    // Завантаження фону робочого столу
+    backgroundImage = QPixmap(":/sprites/assets/desktop_background.svg");
+
     gameTimerId = startTimer(16); // ~60 FPS
 
     elapsedTimer.start();
@@ -19,10 +22,15 @@ void GameWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     // Фон робочого столу
-    QLinearGradient gradient(0, 0, 0, height());
-    gradient.setColorAt(0, QColor(0, 120, 215));
-    gradient.setColorAt(1, QColor(0, 80, 150));
-    painter.fillRect(rect(), gradient);
+    if (!backgroundImage.isNull()) {
+        painter.drawPixmap(0, 0, width(), height(), backgroundImage);
+    } else {
+        // Fallback - градієнт
+        QLinearGradient gradient(0, 0, 0, height());
+        gradient.setColorAt(0, QColor(0, 120, 215));
+        gradient.setColorAt(1, QColor(0, 80, 150));
+        painter.fillRect(rect(), gradient);
+    }
 
     game.render(painter);
 }

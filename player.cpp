@@ -8,11 +8,14 @@ Player::Player(QPointF pos, QSizeF s)
     size = s;
     speed = 300.0;
 
-    // Завантаження спрайту
-    sprite = QPixmap(":/sprites/assets/cursor.svg");
-    if (sprite.isNull()) {
-        qDebug() << "Failed to load cursor sprite!";
-    }
+    // Завантаження спрайтів курсора (5 станів HP: 100, 80, 60, 40, 20)
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor_100.png")); // 100 HP - цілий
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor_80.png"));  // 80 HP
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor_60.png"));  // 60 HP
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor_40.png"));  // 40 HP
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor_20.png"));  // 20 HP - найбільш пошкоджений
+
+    updateSprite();
 }
 
 void Player::update(double deltaTime)
@@ -137,11 +140,13 @@ void Player::takeDamage(int amount)
 
     health = qMax(0, health - amount);
     invincibilityTimer = invincibilityDuration;
+    updateSprite();
 }
 
 void Player::heal(int amount)
 {
     health = qMin(maxHealth, health + amount);
+    updateSprite();
 }
 
 void Player::attack()
@@ -167,4 +172,27 @@ QRectF Player::getAttackBounds() const
 QRectF Player::getBounds() const
 {
     return QRectF(position, size);
+}
+
+void Player::updateSprite()
+{
+    // Вибір спрайту залежно від HP
+    // 100 HP -> index 0, 80 HP -> index 1, 60 HP -> index 2, 40 HP -> index 3, 20 HP -> index 4
+    int spriteIndex = 0;
+
+    if (health > 80) {
+        spriteIndex = 0; // 100 HP - цілий
+    } else if (health > 60) {
+        spriteIndex = 1; // 80 HP
+    } else if (health > 40) {
+        spriteIndex = 2; // 60 HP
+    } else if (health > 20) {
+        spriteIndex = 3; // 40 HP
+    } else {
+        spriteIndex = 4; // 20 HP або менше - найбільш пошкоджений
+    }
+
+    if (spriteIndex < cursorSprites.size() && !cursorSprites[spriteIndex].isNull()) {
+        sprite = cursorSprites[spriteIndex];
+    }
 }
