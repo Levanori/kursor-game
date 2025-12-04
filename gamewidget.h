@@ -2,6 +2,7 @@
 #define GAMEWIDGET_H
 
 #include <QWidget>
+#include <QElapsedTimer>
 #include "game.h"
 
 class GameWidget : public QWidget
