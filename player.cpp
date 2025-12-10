@@ -60,9 +60,6 @@ void Player::update(double deltaTime)
     position.setX(position.x() + velocityX * deltaTime);
     position.setY(position.y() + velocityY * deltaTime);
 
-    // Обмеження в межах екрану (800x600)
-    position.setX(qBound(0.0, position.x(), 800.0 - size.width()));
-    position.setY(qBound(0.0, position.y(), 600.0 - size.height()));
 }
 
 void Player::render(QPainter& painter)

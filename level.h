@@ -22,10 +22,17 @@ public:
     bool isGameOver() const { return gameOver; }
     int getScore() const { return score; }
 
+    void handleResize(int w, int h);
+    double getScaleFactor() const;
+
+    int getVirtualWidth() const { return VIRTUAL_WIDTH; }
+    int getVirtualHeight() const { return VIRTUAL_HEIGHT; }
+
+    void renderUI(QPainter& painter, double scaleFactor, double offsetX, double offsetY);
 private:
     void checkCollisions();
     void spawnEnemy();
-    void renderUI(QPainter& painter);
+
 
     Player* player;
     QVector<Enemy*> enemies;
@@ -37,9 +44,10 @@ private:
     double spawnTimer = 0;
     double spawnInterval = 2.0;
 
-    // Розміри екрану
-    int screenWidth = 800;
-    int screenHeight = 600;
+    const int VIRTUAL_WIDTH = 800;
+    const int VIRTUAL_HEIGHT = 600;
+    int currentScreenWidth = VIRTUAL_WIDTH;
+    int currentScreenHeight = VIRTUAL_HEIGHT;
 };
 
 #endif // LEVEL_H

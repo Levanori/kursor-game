@@ -7,7 +7,6 @@ int main(int argc, char *argv[])
 
     GameWidget gameWidget;
     gameWidget.setWindowTitle("test");
-    gameWidget.resize(800, 600);
     gameWidget.show();
 
     return a.exec();
