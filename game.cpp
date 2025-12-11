@@ -77,23 +77,30 @@ void Game::handleMouseClick(const QPoint &pos)
 
     int buttonW = 300;
     int buttonH = 50;
-    int buttonX = (w - buttonW) / 2;
-    int startY = h / 2 - 50;
     int spacing = 80;
 
+    int leftColX = (w / 2) - buttonW - 20;
+    int rightColX = (w / 2) + 20; // Права колонка
+    int startY = h / 2 - 50;
     // кнопка "Continue"
-    QRect continueRect(buttonX, startY, buttonW, buttonH);
+    QRect continueRect(leftColX, startY, buttonW, buttonH);
     // кнопка "Restart"
-    QRect restartRect(buttonX, startY + spacing, buttonW, buttonH);
+    QRect restartRect(leftColX, startY + spacing, buttonW, buttonH);
     // кнопка "Quit"
-    QRect quitRect(buttonX, startY + 2 * spacing, buttonW, buttonH);
+    QRect quitRect(leftColX, startY + 2 * spacing, buttonW, buttonH);
+    // 725x450
+    QRect scale725Rect(rightColX, startY, buttonW, buttonH);
+    // 1450x900
+    QRect scale1450Rect(rightColX, startY + spacing, buttonW, buttonH);
+    // Fullscreen
+    QRect scaleFullRect(rightColX, startY + 2 * spacing, buttonW, buttonH);
 
+    Level* currentLevel = getCurrentLevel();
     // перевірка, на яку кнопку клікнув користувач
     if (continueRect.contains(pos)) {
         isPaused = false;
         qDebug() << "Game Continued";
     } else if (restartRect.contains(pos)) {
-        Level* currentLevel = getCurrentLevel();
         if (currentLevel) {
             currentLevel->reset();
             isPaused = false;
@@ -102,6 +109,18 @@ void Game::handleMouseClick(const QPoint &pos)
     } else if (quitRect.contains(pos)) {
         qDebug() << "Quit Requested";
         emit quitRequested();
+    } else if (scale725Rect.contains(pos)) {
+        emit requestWindowResize(QSize(725, 450));
+        isPaused = false;
+        qDebug() << "Resolution set to 725x450";
+    } else if (scale1450Rect.contains(pos)) {
+        emit requestWindowResize(QSize(1450, 900));
+        isPaused = false;
+        qDebug() << "Resolution set to 1450x900";
+    } else if (scaleFullRect.contains(pos)) {
+        emit requestFullscreen();
+        isPaused = false;
+        qDebug() << "Fullscreen requested";
     }
 }
 

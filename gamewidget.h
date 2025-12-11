@@ -20,10 +20,10 @@ protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
 
-    void resizeEvent(QResizeEvent *event) override;
-
 private slots:
     void handleQuitRequest();
+    void handleWindowResize(QSize newSize);
+    void handleFullscreenRequest();
 
 private:
     Game game;

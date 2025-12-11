@@ -2,14 +2,17 @@
 
 GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
 {
-    setMinimumSize(1000, 600);
+    setFixedSize(725, 450);
     game.initialize();
+    game.handleResize(width(), height());
 
     setFocusPolicy(Qt::StrongFocus);
     // Завантаження фону робочого столу
     backgroundImage = QPixmap(":/sprites/assets/desktop_background.svg");
 
     connect(&game, &Game::quitRequested, this, &GameWidget::handleQuitRequest);
+    connect(&game, &Game::requestWindowResize, this, &GameWidget::handleWindowResize);
+    connect(&game, &Game::requestFullscreen, this, &GameWidget::handleFullscreenRequest);
 
     gameTimerId = startTimer(16); // ~60 FPS
 
@@ -17,15 +20,38 @@ GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
     lastFrameTime = 0;
 }
 
-void GameWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    game.handleResize(event->size().width(), event->size().height());
-}
-
 void GameWidget::handleQuitRequest()
 {
     this->close();
+}
+
+void GameWidget::handleWindowResize(QSize newSize)
+{
+    if (isFullScreen()) {
+        showNormal();
+    }
+    setFixedSize(newSize);
+
+    // цетрування програми
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen) {
+        QRect screenGeometry = screen->availableGeometry();
+        int x = (screenGeometry.width() - newSize.width()) / 2;
+        int y = (screenGeometry.height() - newSize.height()) / 2;
+        move(x, y);
+    }
+
+    game.handleResize(newSize.width(), newSize.height());
+    update();
+}
+
+void GameWidget::handleFullscreenRequest()
+{
+    showFullScreen();
+    // оновлення внутрішніх розмірів Game, використовуючи фактичні розміри вікна
+    QSize currentSize = geometry().size();
+    game.handleResize(currentSize.width(), currentSize.height());
+    update();
 }
 
 void GameWidget::paintEvent(QPaintEvent *event)
@@ -85,28 +111,62 @@ void GameWidget::paintEvent(QPaintEvent *event)
 
             int buttonW = 300;
             int buttonH = 50;
-            int buttonX = (w - buttonW) / 2;
-            int startY = h / 2 - 50;
             int spacing = 80;
 
+            int leftColX = (w / 2) - buttonW - 20;
             // стиль кнопок
+
             painter.setPen(Qt::black);
             painter.setBrush(QColor(220, 220, 220, 255));
+            QColor textColor = Qt::black;
 
             // кнопка "Continue"
-            QRect continueRect(buttonX, startY, buttonW, buttonH);
+            QRect continueRect(leftColX, h / 2 - 50, buttonW, buttonH);
             painter.drawRect(continueRect);
+            painter.setPen(textColor);
             painter.drawText(continueRect, Qt::AlignCenter, "Continue (ESC)");
 
             // кнопка "Restart"
-            QRect restartRect(buttonX, startY + spacing, buttonW, buttonH);
+            QRect restartRect(leftColX, h / 2 - 50 + spacing, buttonW, buttonH);
+            painter.setPen(Qt::black); painter.setBrush(QColor(220, 220, 220, 255));
             painter.drawRect(restartRect);
+            painter.setPen(textColor);
             painter.drawText(restartRect, Qt::AlignCenter, "Restart");
 
             // кнопка "Quit"
-            QRect quitRect(buttonX, startY + 2 * spacing, buttonW, buttonH);
+            QRect quitRect(leftColX, h / 2 - 50 + 2 * spacing, buttonW, buttonH);
+            painter.setPen(Qt::black); painter.setBrush(QColor(220, 220, 220, 255));
             painter.drawRect(quitRect);
+            painter.setPen(textColor);
             painter.drawText(quitRect, Qt::AlignCenter, "Quit");
+
+            int rightColX = (w / 2) + 20;
+            painter.setPen(Qt::white);
+            painter.setFont(QFont("Arial", 18, QFont::Bold));
+            painter.drawText(QRect(rightColX, h / 2 - 90, buttonW, 30), Qt::AlignCenter, "Scale");
+
+            // стиль для кнопок масштабування
+            painter.setFont(QFont("Arial", 22, QFont::Bold));
+            painter.setPen(Qt::black);
+            painter.setBrush(QColor(220, 220, 220, 255));
+
+            // 725x450
+            QRect scale725Rect(rightColX, h / 2 - 50, buttonW, buttonH);
+            painter.drawRect(scale725Rect);
+            painter.setPen(textColor);
+            painter.drawText(scale725Rect, Qt::AlignCenter, "725x450");
+
+            // 1450x900
+            QRect scale1450Rect(rightColX, h / 2 - 50 + spacing, buttonW, buttonH);
+            painter.drawRect(scale1450Rect);
+            painter.setPen(textColor);
+            painter.drawText(scale1450Rect, Qt::AlignCenter, "1450x900");
+
+            // Fullscreen
+            QRect scaleFullRect(rightColX, h / 2 - 50 + 2 * spacing, buttonW, buttonH);
+            painter.drawRect(scaleFullRect);
+            painter.setPen(textColor);
+            painter.drawText(scaleFullRect, Qt::AlignCenter, "Fullscreen");
         }
     }
 }

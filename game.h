@@ -25,12 +25,14 @@ public:
 
 signals:
     void quitRequested();
+    void requestWindowResize(QSize newSize);
+    void requestFullscreen();
 
 private:
     Level* currentLevel;
     bool isPaused;
-    int screenWidth = 1000;
-    int screenHeight = 600;
+    int screenWidth;
+    int screenHeight;
 };
 
 #endif // GAME_H

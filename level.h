@@ -46,8 +46,8 @@ private:
     double spawnInterval = 2.0;
 
 
-    const int VIRTUAL_WIDTH = 1000;
-    const int VIRTUAL_HEIGHT = 600;
+    const int VIRTUAL_WIDTH = 725;
+    const int VIRTUAL_HEIGHT = 450;
     int currentScreenWidth = VIRTUAL_WIDTH;
     int currentScreenHeight = VIRTUAL_HEIGHT;
 };
