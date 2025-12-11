@@ -163,7 +163,7 @@ QRectF Player::getAttackBounds() const
         position.y() + size.height() / 2 - attackRadius,
         attackRadius * 2,
         attackRadius * 2
-    );
+        );
 }
 
 QRectF Player::getBounds() const
@@ -179,6 +179,11 @@ void Player::resetHealth()
     attackTimer = 0;
     attackCooldown = 0;
     updateSprite();
+}
+
+void Player::clearKeys()
+{
+    pressedKeys.clear();
 }
 
 void Player::updateSprite()

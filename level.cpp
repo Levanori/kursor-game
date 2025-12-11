@@ -128,22 +128,22 @@ void Level::spawnEnemy()
     int edge = QRandomGenerator::global()->bounded(4);
 
     switch (edge) {
-        case 0: // Верх
-            x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
-            y = -32;
-            break;
-        case 1: // Право
-            x = VIRTUAL_WIDTH;
-            y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
-            break;
-        case 2: // Низ
-            x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
-            y = VIRTUAL_HEIGHT;
-            break;
-        default: // Ліво
-            x = -32;
-            y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
-            break;
+    case 0: // Верх
+        x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
+        y = -32;
+        break;
+    case 1: // Право
+        x = VIRTUAL_WIDTH;
+        y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
+        break;
+    case 2: // Низ
+        x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
+        y = VIRTUAL_HEIGHT;
+        break;
+    default: // Ліво
+        x = -32;
+        y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
+        break;
     }
 
     Enemy* enemy = new Enemy(QPointF(x, y), QSizeF(32, 32));
@@ -161,12 +161,9 @@ void Level::renderUI(QPainter& painter, double scaleFactor, double offsetX, doub
     int scaledW = (int)(VIRTUAL_WIDTH * scaleFactor);
     int scaledH = (int)(VIRTUAL_HEIGHT * scaleFactor);
 
-
-    // HP Bar
-    // Позиція HP Bar на екрані: screenX + 10 пікселів від лівого краю масштабованого світу.
     int hpBarX = screenX + 10;
     int hpBarY = screenY + 10;
-    int hpBarW = 200; // Фіксована ширина в пікселях
+    int hpBarW = 200;
     int hpBarH = 20;
 
     painter.setBrush(Qt::darkRed);
@@ -211,6 +208,7 @@ void Level::reset()
 
     player->setPosition(QPointF(400, 300));
     player->resetHealth();
+    player->clearKeys();
 
     gameOver = false;
     score = 0;

@@ -9,6 +9,8 @@ GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
     // Завантаження фону робочого столу
     backgroundImage = QPixmap(":/sprites/assets/desktop_background.svg");
 
+    connect(&game, &Game::quitRequested, this, &GameWidget::handleQuitRequest);
+
     gameTimerId = startTimer(16); // ~60 FPS
 
     elapsedTimer.start();
@@ -19,6 +21,11 @@ void GameWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     game.handleResize(event->size().width(), event->size().height());
+}
+
+void GameWidget::handleQuitRequest()
+{
+    this->close();
 }
 
 void GameWidget::paintEvent(QPaintEvent *event)
@@ -74,12 +81,32 @@ void GameWidget::paintEvent(QPaintEvent *event)
         } else if (game.isitPaused()) {
             painter.fillRect(0, 0, w, h, QColor(0, 0, 0, 128));
 
-            painter.setPen(Qt::white);
-            painter.setFont(QFont("Arial", 32, QFont::Bold));
-            painter.drawText(QRect(0, h / 2 - 50, w, 50), Qt::AlignCenter, "PAUSED");
+            painter.setFont(QFont("Arial", 22, QFont::Bold));
 
-            painter.setFont(QFont("Arial", 18));
-            painter.drawText(QRect(0, h / 2 + 20, w, 50), Qt::AlignCenter, "Press ESC to continue");
+            int buttonW = 300;
+            int buttonH = 50;
+            int buttonX = (w - buttonW) / 2;
+            int startY = h / 2 - 50;
+            int spacing = 80;
+
+            // стиль кнопок
+            painter.setPen(Qt::black);
+            painter.setBrush(QColor(220, 220, 220, 255));
+
+            // кнопка "Continue"
+            QRect continueRect(buttonX, startY, buttonW, buttonH);
+            painter.drawRect(continueRect);
+            painter.drawText(continueRect, Qt::AlignCenter, "Continue (ESC)");
+
+            // кнопка "Restart"
+            QRect restartRect(buttonX, startY + spacing, buttonW, buttonH);
+            painter.drawRect(restartRect);
+            painter.drawText(restartRect, Qt::AlignCenter, "Restart");
+
+            // кнопка "Quit"
+            QRect quitRect(buttonX, startY + 2 * spacing, buttonW, buttonH);
+            painter.drawRect(quitRect);
+            painter.drawText(quitRect, Qt::AlignCenter, "Quit");
         }
     }
 }
@@ -109,4 +136,15 @@ void GameWidget::keyReleaseEvent(QKeyEvent *event)
         game.handleKeyRelease(event->key());
     }
     QWidget::keyReleaseEvent(event);
+}
+
+void GameWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (game.isitPaused()) {
+        // передаємо координати кліка у логіку Game для обробки
+        game.handleMouseClick(event->pos());
+        update(); // перемальовуємо після кліка
+        return;
+    }
+    QWidget::mousePressEvent(event);
 }

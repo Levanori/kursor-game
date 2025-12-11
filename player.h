@@ -39,6 +39,8 @@ public:
     void setPosition(const QPointF& newPos) { position = newPos; }
 
     void resetHealth();
+    // очищення ключів, щоб після рестарту не було багу з рухом
+    void clearKeys();
 private:
     void updateSprite(); // Оновлення спрайту залежно від HP
 
@@ -61,3 +63,4 @@ private:
 };
 
 #endif // PLAYER_H
+
