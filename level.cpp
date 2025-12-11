@@ -24,6 +24,15 @@ void Level::update(double deltaTime)
     // Оновлення гравця
     player->update(deltaTime);
 
+    QPointF pos = player->getPosition();
+    QSizeF size = player->getSize();
+
+    // обмеження X та Y для гравця
+    pos.setX(qBound(0.0, pos.x(), (double)VIRTUAL_WIDTH - size.width()));
+    pos.setY(qBound(0.0, pos.y(), (double)VIRTUAL_HEIGHT - size.height()));
+
+    player->setPosition(pos);
+
     if (player->isDead()) {
         gameOver = true;
         return;
@@ -66,27 +75,23 @@ void Level::render(QPainter& painter)
 
     // UI
     renderUI(painter);
-
-    // Game Over екран
-    if (gameOver) {
-        painter.fillRect(0, 0, screenWidth, screenHeight, QColor(0, 0, 0, 180));
-        painter.setPen(Qt::red);
-        painter.setFont(QFont("Arial", 48, QFont::Bold));
-        painter.drawText(QRect(0, 200, screenWidth, 100), Qt::AlignCenter, "GAME OVER");
-        painter.setPen(Qt::white);
-        painter.setFont(QFont("Arial", 24));
-        painter.drawText(QRect(0, 320, screenWidth, 50), Qt::AlignCenter, QString("Score: %1").arg(score));
-    }
 }
 
 void Level::handleKeyPress(int key)
 {
+    if (gameOver) {
+        if (key == Qt::Key_Escape) {
+            // логіка для рестарту
+        }
+        return;
+    }
     player->setKeyPressed(key, true);
 
     // Атака пробілом
     if (key == Qt::Key_Space) {
         player->attack();
     }
+
 }
 
 void Level::handleKeyRelease(int key)
@@ -126,20 +131,20 @@ void Level::spawnEnemy()
 
     switch (edge) {
         case 0: // Верх
-            x = QRandomGenerator::global()->bounded(screenWidth);
+            x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
             y = -32;
             break;
         case 1: // Право
-            x = screenWidth;
-            y = QRandomGenerator::global()->bounded(screenHeight);
+            x = VIRTUAL_WIDTH;
+            y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
             break;
         case 2: // Низ
-            x = QRandomGenerator::global()->bounded(screenWidth);
-            y = screenHeight;
+            x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
+            y = VIRTUAL_HEIGHT;
             break;
         default: // Ліво
             x = -32;
-            y = QRandomGenerator::global()->bounded(screenHeight);
+            y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
             break;
     }
 
@@ -164,9 +169,40 @@ void Level::renderUI(QPainter& painter)
     painter.drawText(15, 26, QString("HP: %1/%2").arg(player->getHealth()).arg(player->getMaxHealth()));
 
     // Score
-    painter.drawText(screenWidth - 120, 26, QString("Score: %1").arg(score));
+    painter.drawText(VIRTUAL_WIDTH - 120, 26, QString("Score: %1").arg(score));
 
     // Підказки керування
     painter.setFont(QFont("Arial", 10));
-    painter.drawText(10, screenHeight - 10, "WASD/Arrows - Move | SPACE - Attack | ESC - Pause");
+    painter.drawText(10, VIRTUAL_WIDTH - 10, "WASD/Arrows - Move | SPACE - Attack | ESC - Pause");
+}
+
+void Level::handleResize(int w, int h)
+{
+    currentScreenWidth = w;
+    currentScreenHeight = h;
+}
+
+
+double Level::getScaleFactor() const
+{
+    double scaleX = (double)currentScreenWidth / VIRTUAL_WIDTH;
+    double scaleY = (double)currentScreenHeight / VIRTUAL_HEIGHT;
+    return qMin(scaleX, scaleY);
+}
+
+void Level::reset()
+{
+    qDeleteAll(enemies);
+    enemies.clear();
+
+    player->setPosition(QPointF(400, 300));
+    player->resetHealth();
+
+    gameOver = false;
+    score = 0;
+    spawnTimer = 0;
+
+    for (int i = 0; i < 3; ++i) {
+        spawnEnemy();
+    }
 }

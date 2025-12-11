@@ -16,6 +16,10 @@ public:
     void handleKeyPress(int key);
     void handleKeyRelease(int key);
 
+    void handleResize(int w, int h);
+    Level* getCurrentLevel() const { return currentLevel; }
+    bool isitPaused() const { return isPaused; }
+
 private:
     Level* currentLevel;
     bool isPaused;

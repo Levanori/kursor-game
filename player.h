@@ -36,6 +36,9 @@ public:
     // Доступ до позиції для ворогів
     QPointF* getPositionPtr() { return &position; }
 
+    void setPosition(const QPointF& newPos) { position = newPos; }
+
+    void resetHealth();
 private:
     void updateSprite(); // Оновлення спрайту залежно від HP
 

@@ -60,9 +60,6 @@ void Player::update(double deltaTime)
     position.setX(position.x() + velocityX * deltaTime);
     position.setY(position.y() + velocityY * deltaTime);
 
-    // Обмеження в межах екрану (800x600)
-    position.setX(qBound(0.0, position.x(), 800.0 - size.width()));
-    position.setY(qBound(0.0, position.y(), 600.0 - size.height()));
 }
 
 void Player::render(QPainter& painter)
@@ -172,6 +169,16 @@ QRectF Player::getAttackBounds() const
 QRectF Player::getBounds() const
 {
     return QRectF(position, size);
+}
+
+void Player::resetHealth()
+{
+    health = maxHealth;
+    invincibilityTimer = 0;
+    attacking = false;
+    attackTimer = 0;
+    attackCooldown = 0;
+    updateSprite();
 }
 
 void Player::updateSprite()

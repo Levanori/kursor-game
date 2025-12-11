@@ -32,27 +32,22 @@ void Game::render(QPainter& painter)
     if (currentLevel) {
         currentLevel->render(painter);
     }
-
-    // Пауза
-    if (isPaused) {
-        painter.fillRect(0, 0, 800, 600, QColor(0, 0, 0, 128));
-        painter.setPen(Qt::white);
-        painter.setFont(QFont("Arial", 32, QFont::Bold));
-        painter.drawText(QRect(0, 250, 800, 50), Qt::AlignCenter, "PAUSED");
-        painter.setFont(QFont("Arial", 18));
-        painter.drawText(QRect(0, 320, 800, 50), Qt::AlignCenter, "Press ESC to continue");
-    }
 }
 
 void Game::handleKeyPress(int key)
 {
     if (key == Qt::Key_Escape) {
+        Level* currentLevel = getCurrentLevel();
+        if (currentLevel && currentLevel->isGameOver()) {
+            currentLevel->reset();
+            return;
+        }
         isPaused = !isPaused;
         qDebug() << "Game Paused:" << isPaused;
         return;
     }
 
-    if (!isPaused && currentLevel) {
+    if (currentLevel) {
         currentLevel->handleKeyPress(key);
     }
 }
@@ -61,5 +56,12 @@ void Game::handleKeyRelease(int key)
 {
     if (!isPaused && currentLevel) {
         currentLevel->handleKeyRelease(key);
+    }
+}
+
+void Game::handleResize(int w, int h)
+{
+    if (currentLevel) {
+        currentLevel->handleResize(w, h);
     }
 }
