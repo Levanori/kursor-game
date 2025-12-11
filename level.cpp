@@ -73,8 +73,6 @@ void Level::render(QPainter& painter)
     // Рендер гравця
     player->render(painter);
 
-    // UI
-    renderUI(painter);
 }
 
 void Level::handleKeyPress(int key)
@@ -153,27 +151,43 @@ void Level::spawnEnemy()
     enemies.append(enemy);
 }
 
-void Level::renderUI(QPainter& painter)
+void Level::renderUI(QPainter& painter, double scaleFactor, double offsetX, double offsetY)
 {
     // HP Bar
+    int screenX = (int)(offsetX * scaleFactor);
+    int screenY = (int)(offsetY * scaleFactor);
+
+    // Ширина/висота масштабованого віртуального світу
+    int scaledW = (int)(VIRTUAL_WIDTH * scaleFactor);
+    int scaledH = (int)(VIRTUAL_HEIGHT * scaleFactor);
+
+
+    // HP Bar
+    // Позиція HP Bar на екрані: screenX + 10 пікселів від лівого краю масштабованого світу.
+    int hpBarX = screenX + 10;
+    int hpBarY = screenY + 10;
+    int hpBarW = 200; // Фіксована ширина в пікселях
+    int hpBarH = 20;
+
     painter.setBrush(Qt::darkRed);
     painter.setPen(Qt::black);
-    painter.drawRect(10, 10, 200, 20);
+    painter.drawRect(hpBarX, hpBarY, hpBarW, hpBarH);
 
     double healthPercent = (double)player->getHealth() / player->getMaxHealth();
     painter.setBrush(Qt::green);
-    painter.drawRect(10, 10, (int)(200 * healthPercent), 20);
+    painter.drawRect(hpBarX, hpBarY, (int)(hpBarW * healthPercent), hpBarH);
 
     painter.setPen(Qt::white);
     painter.setFont(QFont("Arial", 12, QFont::Bold));
-    painter.drawText(15, 26, QString("HP: %1/%2").arg(player->getHealth()).arg(player->getMaxHealth()));
+    painter.drawText(hpBarX + 5, hpBarY + 16, QString("HP: %1/%2").arg(player->getHealth()).arg(player->getMaxHealth()));
 
     // Score
-    painter.drawText(VIRTUAL_WIDTH - 120, 26, QString("Score: %1").arg(score));
+    int scoreTextX = screenX + scaledW - 120;
+    painter.drawText(scoreTextX, hpBarY + 16, QString("Score: %1").arg(score));
 
     // Підказки керування
     painter.setFont(QFont("Arial", 10));
-    painter.drawText(10, VIRTUAL_WIDTH - 10, "WASD/Arrows - Move | SPACE - Attack | ESC - Pause");
+    painter.drawText(screenX + 10, screenY + scaledH - 10, "WASD/Arrows - Move | SPACE - Attack | ESC - Pause");
 }
 
 void Level::handleResize(int w, int h)

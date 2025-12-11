@@ -55,6 +55,8 @@ void GameWidget::paintEvent(QPaintEvent *event)
         game.render(painter);
         painter.restore();
 
+        currentLevel->renderUI(painter, scale, offsetX, offsetY);
+
         int w = width();
         int h = height();
         if (currentLevel->isGameOver()) {

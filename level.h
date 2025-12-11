@@ -27,13 +27,13 @@ public:
 
     int getVirtualWidth() const { return VIRTUAL_WIDTH; }
     int getVirtualHeight() const { return VIRTUAL_HEIGHT; }
-
     void reset();
 
+    void renderUI(QPainter& painter, double scaleFactor, double offsetX, double offsetY);
 private:
     void checkCollisions();
     void spawnEnemy();
-    void renderUI(QPainter& painter);
+
 
     Player* player;
     QVector<Enemy*> enemies;
@@ -44,6 +44,7 @@ private:
     // Спавн ворогів
     double spawnTimer = 0;
     double spawnInterval = 2.0;
+
 
     const int VIRTUAL_WIDTH = 1000;
     const int VIRTUAL_HEIGHT = 600;
