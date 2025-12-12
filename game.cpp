@@ -43,6 +43,7 @@ void Game::handleKeyPress(int key)
             return;
         }
         isPaused = !isPaused;
+        clearPlayerKeys();
         qDebug() << "Game Paused:" << isPaused;
         return;
     }
@@ -99,11 +100,13 @@ void Game::handleMouseClick(const QPoint &pos)
     // перевірка, на яку кнопку клікнув користувач
     if (continueRect.contains(pos)) {
         isPaused = false;
+        clearPlayerKeys();
         qDebug() << "Game Continued";
     } else if (restartRect.contains(pos)) {
         if (currentLevel) {
             currentLevel->reset();
             isPaused = false;
+            clearPlayerKeys();
             qDebug() << "Game Restarted";
         }
     } else if (quitRect.contains(pos)) {
@@ -112,15 +115,25 @@ void Game::handleMouseClick(const QPoint &pos)
     } else if (scale725Rect.contains(pos)) {
         emit requestWindowResize(QSize(725, 450));
         isPaused = false;
+        clearPlayerKeys();
         qDebug() << "Resolution set to 725x450";
     } else if (scale1450Rect.contains(pos)) {
         emit requestWindowResize(QSize(1450, 900));
         isPaused = false;
+        clearPlayerKeys();
         qDebug() << "Resolution set to 1450x900";
     } else if (scaleFullRect.contains(pos)) {
         emit requestFullscreen();
         isPaused = false;
+        clearPlayerKeys();
         qDebug() << "Fullscreen requested";
+    }
+}
+
+void Game::clearPlayerKeys()
+{
+    if (currentLevel) {
+        currentLevel->clearPlayerKeys();
     }
 }
 

@@ -30,6 +30,8 @@ public:
     void reset();
 
     void renderUI(QPainter& painter, double scaleFactor, double offsetX, double offsetY);
+
+    void clearPlayerKeys() { player->clearKeys(); }
 private:
     void checkCollisions();
     void spawnEnemy();

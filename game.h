@@ -23,6 +23,7 @@ public:
     Level* getCurrentLevel() const { return currentLevel; }
     bool isitPaused() const { return isPaused; }
 
+    void clearPlayerKeys();
 signals:
     void quitRequested();
     void requestWindowResize(QSize newSize);
