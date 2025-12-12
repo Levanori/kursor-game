@@ -17,13 +17,16 @@ public:
     // Керування
     void setKeyPressed(int key, bool pressed);
 
-    // Здоров'я
+    // Нагрузка
     void takeDamage(int amount);
-    void heal(int amount);
-    int getHealth() const { return health; }
-    int getMaxHealth() const { return maxHealth; }
-    bool isDead() const { return health <= 0; }
-    bool isInvincible() const { return invincibilityTimer > 0; }
+    int getCpuLoad() { return cpuLoad; }
+    int getMaxCpuLoad() { return maxCpuLoad; }
+    bool isCrashed() { return cpuLoad >= maxCpuLoad; }
+    void reset();
+    void increaseLoad(int amount);
+    void decreaseLoad(int amount);
+
+    bool isInvincible() { return invincibilityTimer > 0; }
 
     // Атака
     void attack();
@@ -38,7 +41,6 @@ public:
 
     void setPosition(const QPointF& newPos) { position = newPos; }
 
-    void resetHealth();
     // очищення ключів, щоб після рестарту не було багу з рухом
     void clearKeys();
 private:
@@ -48,9 +50,9 @@ private:
     QVector<QPixmap> cursorSprites; // 5 станів: 100, 80, 60, 40, 20 HP
     QSet<int> pressedKeys;
 
-    // Здоров'я
-    int health = 100;
-    int maxHealth = 100;
+    // нагрузка
+    int cpuLoad = 0;
+    int maxCpuLoad = 100;
     double invincibilityTimer = 0;
     double invincibilityDuration = 1.0;
 

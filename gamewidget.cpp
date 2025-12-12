@@ -107,15 +107,19 @@ void GameWidget::paintEvent(QPaintEvent *event)
         } else if (game.isitPaused()) {
             painter.fillRect(0, 0, w, h, QColor(0, 0, 0, 128));
 
-            painter.setFont(QFont("Arial", 22, QFont::Bold));
+            painter.setFont(QFont("Arial", 18, QFont::Bold));
 
             int buttonW = 300;
             int buttonH = 50;
             int spacing = 80;
 
             int leftColX = (w / 2) - buttonW - 20;
-            // стиль кнопок
 
+            painter.setPen(Qt::yellow);
+            painter.drawText(0, h / 4 - 20, w, 30, Qt::AlignCenter, "WASD/Arrows - Move | SPACE - Attack | ESC - Continue");
+
+            // стиль кнопок
+            painter.setFont(QFont("Arial", 22, QFont::Bold));
             painter.setPen(Qt::black);
             painter.setBrush(QColor(220, 220, 220, 255));
             QColor textColor = Qt::black;

@@ -40,6 +40,9 @@ private:
     Player* player;
     QVector<Enemy*> enemies;
 
+    const double LOAD_PER_SECOND = 2.0;
+    const int LOAD_PER_KILL = 5;
+    double accumulatedLoad = 0.0; // щоб враховувалося автоматичне навантаження
     bool gameOver = false;
     int score = 0;
 

@@ -41,13 +41,14 @@ void Player::update(double deltaTime)
     double velocityX = 0;
     double velocityY = 0;
 
-    if (pressedKeys.contains(Qt::Key_W) || pressedKeys.contains(Qt::Key_Up))
+    if (pressedKeys.contains(Qt::Key_W) || pressedKeys.contains(Qt::Key_Up) || pressedKeys.contains(QChar(0x0426).unicode()))
         velocityY = -speed;
-    if (pressedKeys.contains(Qt::Key_S) || pressedKeys.contains(Qt::Key_Down))
+    if (pressedKeys.contains(Qt::Key_S) || pressedKeys.contains(Qt::Key_Down)
+        || pressedKeys.contains(QChar(0x0406).unicode()) || pressedKeys.contains(QChar(0x042B).unicode()))
         velocityY = speed;
-    if (pressedKeys.contains(Qt::Key_A) || pressedKeys.contains(Qt::Key_Left))
+    if (pressedKeys.contains(Qt::Key_A) || pressedKeys.contains(Qt::Key_Left) || pressedKeys.contains(QChar(0x0424).unicode()))
         velocityX = -speed;
-    if (pressedKeys.contains(Qt::Key_D) || pressedKeys.contains(Qt::Key_Right))
+    if (pressedKeys.contains(Qt::Key_D) || pressedKeys.contains(Qt::Key_Right) || pressedKeys.contains(QChar(0x0412).unicode()))
         velocityX = speed;
 
     // Нормалізація діагонального руху
@@ -135,14 +136,26 @@ void Player::takeDamage(int amount)
 {
     if (invincibilityTimer > 0) return;
 
-    health = qMax(0, health - amount);
+    increaseLoad(amount);
     invincibilityTimer = invincibilityDuration;
     updateSprite();
 }
 
-void Player::heal(int amount)
+void Player::increaseLoad(int amount)
 {
-    health = qMin(maxHealth, health + amount);
+    cpuLoad += amount;
+    if (cpuLoad > maxCpuLoad) {
+        cpuLoad = maxCpuLoad;
+    }
+    updateSprite();
+}
+
+void Player::decreaseLoad(int amount)
+{
+    cpuLoad -= amount;
+    if (cpuLoad < 0) {
+        cpuLoad = 0;
+    }
     updateSprite();
 }
 
@@ -171,9 +184,9 @@ QRectF Player::getBounds() const
     return QRectF(position, size);
 }
 
-void Player::resetHealth()
+void Player::reset()
 {
-    health = maxHealth;
+    cpuLoad = 0;
     invincibilityTimer = 0;
     attacking = false;
     attackTimer = 0;
@@ -188,20 +201,19 @@ void Player::clearKeys()
 
 void Player::updateSprite()
 {
-    // Вибір спрайту залежно від HP
-    // 100 HP -> index 0, 80 HP -> index 1, 60 HP -> index 2, 40 HP -> index 3, 20 HP -> index 4
+    // Вибір спрайту залежно від cpuLoad
     int spriteIndex = 0;
 
-    if (health > 80) {
-        spriteIndex = 0; // 100 HP - цілий
-    } else if (health > 60) {
-        spriteIndex = 1; // 80 HP
-    } else if (health > 40) {
-        spriteIndex = 2; // 60 HP
-    } else if (health > 20) {
-        spriteIndex = 3; // 40 HP
+    if (cpuLoad > 80) {
+        spriteIndex = 4;
+    } else if (cpuLoad > 60) {
+        spriteIndex = 3;
+    } else if (cpuLoad > 40) {
+        spriteIndex = 2;
+    } else if (cpuLoad > 20) {
+        spriteIndex = 1;
     } else {
-        spriteIndex = 4; // 20 HP або менше - найбільш пошкоджений
+        spriteIndex = 0;
     }
 
     if (spriteIndex < cursorSprites.size() && !cursorSprites[spriteIndex].isNull()) {

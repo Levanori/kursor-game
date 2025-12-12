@@ -48,6 +48,9 @@ void Game::handleKeyPress(int key)
         return;
     }
 
+    if (isPaused) { // неможливість активувати скіли в паузі
+        return;
+    }
     if (currentLevel) {
         currentLevel->handleKeyPress(key);
     }

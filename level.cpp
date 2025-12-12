@@ -21,6 +21,19 @@ void Level::update(double deltaTime)
 {
     if (gameOver) return;
 
+    if (player) {
+        accumulatedLoad += LOAD_PER_SECOND * deltaTime;
+        if (accumulatedLoad >= 1.0) {
+            // Беремо цілу частину, на яку потрібно збільшити
+            int loadIncrease = (int)accumulatedLoad;
+
+            // Збільшуємо навантаження гравця
+            player->increaseLoad(loadIncrease);
+
+            // Залишаємо лише дробовий залишок для наступного кадру
+            accumulatedLoad -= loadIncrease;
+        }
+    }
     // Оновлення гравця
     player->update(deltaTime);
 
@@ -33,7 +46,7 @@ void Level::update(double deltaTime)
 
     player->setPosition(pos);
 
-    if (player->isDead()) {
+    if (player->isCrashed()) {
         gameOver = true;
         return;
     }
@@ -46,6 +59,7 @@ void Level::update(double deltaTime)
     // Видалення мертвих ворогів
     for (int i = enemies.size() - 1; i >= 0; --i) {
         if (enemies[i]->isDead()) {
+            if (player) player->decreaseLoad(LOAD_PER_KILL);
             delete enemies[i];
             enemies.removeAt(i);
             score += 100;
@@ -78,9 +92,6 @@ void Level::render(QPainter& painter)
 void Level::handleKeyPress(int key)
 {
     if (gameOver) {
-        if (key == Qt::Key_Escape) {
-            // логіка для рестарту
-        }
         return;
     }
     player->setKeyPressed(key, true);
@@ -153,13 +164,11 @@ void Level::spawnEnemy()
 
 void Level::renderUI(QPainter& painter, double scaleFactor, double offsetX, double offsetY)
 {
-    // HP Bar
+    // CPU Bar
     int screenX = (int)(offsetX * scaleFactor);
     int screenY = (int)(offsetY * scaleFactor);
 
-    // Ширина/висота масштабованого віртуального світу
     int scaledW = (int)(VIRTUAL_WIDTH * scaleFactor);
-    int scaledH = (int)(VIRTUAL_HEIGHT * scaleFactor);
 
     int hpBarX = screenX + 10;
     int hpBarY = screenY + 10;
@@ -170,21 +179,25 @@ void Level::renderUI(QPainter& painter, double scaleFactor, double offsetX, doub
     painter.setPen(Qt::black);
     painter.drawRect(hpBarX, hpBarY, hpBarW, hpBarH);
 
-    double healthPercent = (double)player->getHealth() / player->getMaxHealth();
-    painter.setBrush(Qt::green);
-    painter.drawRect(hpBarX, hpBarY, (int)(hpBarW * healthPercent), hpBarH);
+    double loadPercent = (double)player->getCpuLoad() / player->getMaxCpuLoad();
+    if (player->getCpuLoad() > 80) {
+        painter.setBrush(Qt::red);
+    } else if (player->getCpuLoad() > 50) {
+        painter.setBrush(Qt::yellow);
+    } else {
+        painter.setBrush(Qt::green);
+    }
 
-    painter.setPen(Qt::white);
+    painter.drawRect(hpBarX, hpBarY, (int)(hpBarW * loadPercent), hpBarH);
+
+    painter.setPen(Qt::darkGray);
     painter.setFont(QFont("Arial", 12, QFont::Bold));
-    painter.drawText(hpBarX + 5, hpBarY + 16, QString("HP: %1/%2").arg(player->getHealth()).arg(player->getMaxHealth()));
+    painter.drawText(hpBarX + 5, hpBarY + 16, QString("CPU Load: %1%").arg(player->getCpuLoad()));
 
     // Score
+    painter.setPen(Qt::white);
     int scoreTextX = screenX + scaledW - 120;
     painter.drawText(scoreTextX, hpBarY + 16, QString("Score: %1").arg(score));
-
-    // Підказки керування
-    painter.setFont(QFont("Arial", 10));
-    painter.drawText(screenX + 10, screenY + scaledH - 10, "WASD/Arrows - Move | SPACE - Attack | ESC - Pause");
 }
 
 void Level::handleResize(int w, int h)
@@ -207,12 +220,13 @@ void Level::reset()
     enemies.clear();
 
     player->setPosition(QPointF(400, 300));
-    player->resetHealth();
+    player->reset();
     player->clearKeys();
 
     gameOver = false;
     score = 0;
     spawnTimer = 0;
+    accumulatedLoad = 0.0;
 
     for (int i = 0; i < 3; ++i) {
         spawnEnemy();
