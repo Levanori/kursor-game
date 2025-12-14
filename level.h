@@ -3,6 +3,9 @@
 
 #include "player.h"
 #include "enemy.h"
+#include "virusgreen.h"
+#include "virusviolet.h"
+#include "projectile.h"
 #include <QVector>
 
 class Level
@@ -35,10 +38,12 @@ public:
 private:
     void checkCollisions();
     void spawnEnemy();
-
+    void updateProjectiles(double deltaTime);
+    void spawnProjectile(VirusViolet* shooter);
 
     Player* player;
     QVector<Enemy*> enemies;
+    QVector<Projectile*> projectiles;
 
     const double LOAD_PER_SECOND = 2.0;
     const int LOAD_PER_KILL = 5;

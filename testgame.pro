@@ -16,7 +16,10 @@ SOURCES += \
     level.cpp \
     main.cpp \
     player.cpp \
-    testobject.cpp
+    projectile.cpp \
+    testobject.cpp \
+    virusgreen.cpp \
+    virusviolet.cpp
 
 HEADERS += \
     enemy.h \
@@ -25,7 +28,10 @@ HEADERS += \
     gamewidget.h \
     level.h \
     player.h \
-    testobject.h
+    projectile.h \
+    testobject.h \
+    virusgreen.h \
+    virusviolet.h
 
 RESOURCES += \
     resources.qrc

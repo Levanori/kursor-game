@@ -6,13 +6,7 @@ Enemy::Enemy(QPointF pos, QSizeF s)
 {
     position = pos;
     size = s;
-    speed = 80.0;
-
-    // Завантаження спрайту
-    sprite = QPixmap(":/sprites/assets/virus.svg");
-    if (sprite.isNull()) {
-        qDebug() << "Failed to load virus sprite!";
-    }
+    speed = 80.0f;
 }
 
 void Enemy::setTarget(QPointF* targetPos)
@@ -22,7 +16,20 @@ void Enemy::setTarget(QPointF* targetPos)
 
 void Enemy::update(double deltaTime)
 {
-    if (isDead()) return;
+    // Анімація смерті
+    if (playingDeathAnimation) {
+        deathAnimTimer += deltaTime;
+        if (deathAnimTimer >= deathFrameDuration) {
+            deathAnimTimer = 0;
+            deathAnimFrame++;
+            if (deathAnimFrame >= deathAnimationSprites.size()) {
+                deathAnimComplete = true;
+            } else {
+                currentSprite = deathAnimationSprites[deathAnimFrame];
+            }
+        }
+        return;
+    }
 
     // Оновлення cooldown на отримання шкоди
     if (hitCooldown > 0) {
@@ -55,18 +62,18 @@ void Enemy::update(double deltaTime)
 
 void Enemy::render(QPainter& painter)
 {
-    if (isDead()) return;
+    if (deathAnimComplete) return;
 
-    if (!sprite.isNull()) {
-        painter.drawPixmap(position.toPoint(), sprite.scaled(size.toSize()));
+    if (!currentSprite.isNull()) {
+        painter.drawPixmap(position.toPoint(), currentSprite.scaled(size.toSize()));
     } else {
         // Fallback - червоний квадрат
         painter.setBrush(QBrush(Qt::red));
         painter.drawRect(QRectF(position, size));
     }
 
-    // Health bar
-    if (health < maxHealth) {
+    // Health bar (тільки якщо живий і не повне HP)
+    if (!isDead() && health < maxHealth && !playingDeathAnimation) {
         double healthPercent = (double)health / maxHealth;
         painter.setBrush(Qt::red);
         painter.drawRect(QRectF(position.x(), position.y() - 8, size.width(), 4));
@@ -80,12 +87,23 @@ QRectF Enemy::getBounds() const
     return QRectF(position, size);
 }
 
+bool Enemy::isDead() const
+{
+    return health <= 0 && deathAnimComplete;
+}
+
 void Enemy::takeDamage(int amount)
 {
-    if (hitCooldown > 0) return; // Захист від мульти-ударів
+    if (hitCooldown > 0 || playingDeathAnimation) return;
 
     health -= amount;
     hitCooldown = hitCooldownTime;
+
+    if (health <= 0) {
+        onDeath();
+    } else {
+        updateSprite();
+    }
 }
 
 void Enemy::knockback(QPointF fromPos, double force)
@@ -102,4 +120,23 @@ void Enemy::knockback(QPointF fromPos, double force)
         knockbackVelocity.setY(0);
     }
     knockbackTimer = 0.3;
+}
+
+void Enemy::playDeathAnimation()
+{
+    if (deathAnimationSprites.isEmpty()) {
+        deathAnimComplete = true;
+        return;
+    }
+
+    playingDeathAnimation = true;
+    deathAnimFrame = 0;
+    deathAnimTimer = 0;
+    currentSprite = deathAnimationSprites[0];
+}
+
+void Enemy::onDeath()
+{
+    // Запускаємо анімацію смерті
+    playDeathAnimation();
 }

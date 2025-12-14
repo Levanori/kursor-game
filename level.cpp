@@ -1,5 +1,6 @@
 #include "level.h"
 #include <QRandomGenerator>
+#include <QtMath>
 
 Level::Level()
 {
@@ -15,6 +16,7 @@ Level::~Level()
 {
     delete player;
     qDeleteAll(enemies);
+    qDeleteAll(projectiles);
 }
 
 void Level::update(double deltaTime)
@@ -54,7 +56,25 @@ void Level::update(double deltaTime)
     // Оновлення ворогів
     for (Enemy* enemy : enemies) {
         enemy->update(deltaTime);
+
+        // Якщо це фіолетовий вірус - перевіряємо стрільбу
+        VirusViolet* violet = dynamic_cast<VirusViolet*>(enemy);
+        if (violet && violet->canShoot()) {
+            // Обчислюємо відстань до гравця
+            QPointF enemyCenter = enemy->getPosition() + QPointF(enemy->getSize().width() / 2, enemy->getSize().height() / 2);
+            QPointF playerCenter = player->getPosition() + QPointF(player->getSize().width() / 2, player->getSize().height() / 2);
+            QPointF diff = playerCenter - enemyCenter;
+            float distance = qSqrt(diff.x() * diff.x() + diff.y() * diff.y());
+
+            // Стріляємо якщо гравець на відстані 100-400 пікселів
+            if (distance >= 100 && distance <= 400) {
+                spawnProjectile(violet);
+            }
+        }
     }
+
+    // Оновлення снарядів
+    updateProjectiles(deltaTime);
 
     // Видалення мертвих ворогів
     for (int i = enemies.size() - 1; i >= 0; --i) {
@@ -79,6 +99,11 @@ void Level::update(double deltaTime)
 
 void Level::render(QPainter& painter)
 {
+    // Рендер снарядів
+    for (Projectile* proj : projectiles) {
+        proj->render(painter);
+    }
+
     // Рендер ворогів
     for (Enemy* enemy : enemies) {
         enemy->render(painter);
@@ -130,6 +155,17 @@ void Level::checkCollisions()
             enemy->knockback(player->getPosition(), 150.0);
         }
     }
+
+    // Перевірка колізій снарядів з гравцем
+    for (Projectile* proj : projectiles) {
+        if (!proj->isActive()) continue;
+
+        QRectF projBounds(proj->getPosition(), proj->getSize());
+        if (projBounds.intersects(playerBounds) && !player->isInvincible()) {
+            player->takeDamage(proj->getDamage());
+            proj->deactivate();
+        }
+    }
 }
 
 void Level::spawnEnemy()
@@ -157,7 +193,13 @@ void Level::spawnEnemy()
         break;
     }
 
-    Enemy* enemy = new Enemy(QPointF(x, y), QSizeF(32, 32));
+    // Випадково вибираємо тип ворога (70% зелені, 30% фіолетові)
+    Enemy* enemy;
+    if (QRandomGenerator::global()->bounded(100) < 70) {
+        enemy = new VirusGreen(QPointF(x, y), QSizeF(32, 32));
+    } else {
+        enemy = new VirusViolet(QPointF(x, y), QSizeF(32, 32));
+    }
     enemy->setTarget(player->getPositionPtr());
     enemies.append(enemy);
 }
@@ -219,6 +261,9 @@ void Level::reset()
     qDeleteAll(enemies);
     enemies.clear();
 
+    qDeleteAll(projectiles);
+    projectiles.clear();
+
     player->setPosition(QPointF(400, 300));
     player->reset();
     player->clearKeys();
@@ -231,4 +276,40 @@ void Level::reset()
     for (int i = 0; i < 3; ++i) {
         spawnEnemy();
     }
+}
+
+void Level::updateProjectiles(double deltaTime)
+{
+    // Оновлення снарядів
+    for (Projectile* proj : projectiles) {
+        proj->update(deltaTime);
+    }
+
+    // Видалення неактивних снарядів
+    for (int i = projectiles.size() - 1; i >= 0; --i) {
+        if (!projectiles[i]->isActive() ||
+            projectiles[i]->isOutOfBounds(QSizeF(VIRTUAL_WIDTH, VIRTUAL_HEIGHT))) {
+            delete projectiles[i];
+            projectiles.removeAt(i);
+        }
+    }
+}
+
+void Level::spawnProjectile(VirusViolet* shooter)
+{
+    // Позиція снаряду - центр ворога
+    QPointF shooterCenter = shooter->getPosition() +
+                            QPointF(shooter->getSize().width() / 2, shooter->getSize().height() / 2);
+
+    // Напрямок на гравця
+    QPointF direction = shooter->getShootDirection(
+        player->getPosition() + QPointF(player->getSize().width() / 2, player->getSize().height() / 2)
+    );
+
+    // Стріляємо
+    shooter->shoot();
+
+    // Створюємо снаряд
+    Projectile* proj = new Projectile(shooterCenter, direction, 180.0);
+    projectiles.append(proj);
 }

@@ -1,11 +1,25 @@
 <RCC>
     <qresource prefix="/sprites">
-        <file>assets/cursor_100.png</file>
-        <file>assets/cursor_80.png</file>
-        <file>assets/cursor_60.png</file>
-        <file>assets/cursor_40.png</file>
-        <file>assets/cursor_20.png</file>
-        <file>assets/virus.svg</file>
         <file>assets/desktop_background.svg</file>
+        <file>assets/cursor/cursor_20.png</file>
+        <file>assets/cursor/cursor_40.png</file>
+        <file>assets/cursor/cursor_60.png</file>
+        <file>assets/cursor/cursor_80.png</file>
+        <file>assets/cursor/cursor_100.png</file>
+        <file>assets/virus_green/vg_1.png</file>
+        <file>assets/virus_green/vg_2.png</file>
+        <file>assets/virus_green/vg_3.png</file>
+        <file>assets/virus_green/vg_4.png</file>
+        <file>assets/virus_green/vg_5.png</file>
+        <file>assets/virus_green/vg_7.png</file>
+        <file>assets/virus_green/vg_full.png</file>
+        <file>assets/virus_violet/vv_1.png</file>
+        <file>assets/virus_violet/vv_2.png</file>
+        <file>assets/virus_violet/vv_3.png</file>
+        <file>assets/virus_violet/vv_4.png</file>
+        <file>assets/virus_violet/vv_5.png</file>
+        <file>assets/virus_violet/vv_8.png</file>
+        <file>assets/virus_violet/vv_full.png</file>
+        <file>assets/virus_violet/bombshell.png</file>
     </qresource>
 </RCC>

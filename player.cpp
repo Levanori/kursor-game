@@ -9,11 +9,11 @@ Player::Player(QPointF pos, QSizeF s)
     speed = 300.0;
 
     // Завантаження спрайтів курсора (5 станів HP: 100, 80, 60, 40, 20)
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor_100.png")); // 100 HP - цілий
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor_80.png"));  // 80 HP
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor_60.png"));  // 60 HP
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor_40.png"));  // 40 HP
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor_20.png"));  // 20 HP - найбільш пошкоджений
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_100.png")); // 100 HP - цілий
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_80.png"));  // 80 HP
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_60.png"));  // 60 HP
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_40.png"));  // 40 HP
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_20.png"));  // 20 HP - найбільш пошкоджений
 
     updateSprite();
 }
