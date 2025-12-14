@@ -1,4 +1,5 @@
 #include "gamewidget.h"
+#include <QResizeEvent>
 
 GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
 {
@@ -30,6 +31,9 @@ void GameWidget::handleWindowResize(QSize newSize)
     if (isFullScreen()) {
         showNormal();
     }
+    isFullscreen = false;
+    setMinimumSize(0, 0);  // Скидаємо обмеження
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     setFixedSize(newSize);
 
     // цетрування програми
@@ -47,11 +51,13 @@ void GameWidget::handleWindowResize(QSize newSize)
 
 void GameWidget::handleFullscreenRequest()
 {
+    isFullscreen = true;
+    // Знімаємо фіксований розмір перед fullscreen
+    setMinimumSize(0, 0);
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+
     showFullScreen();
-    // оновлення внутрішніх розмірів Game, використовуючи фактичні розміри вікна
-    QSize currentSize = geometry().size();
-    game.handleResize(currentSize.width(), currentSize.height());
-    update();
+    // Розмір буде оновлено через resizeEvent
 }
 
 void GameWidget::paintEvent(QPaintEvent *event)
@@ -211,4 +217,13 @@ void GameWidget::mousePressEvent(QMouseEvent *event)
         return;
     }
     QWidget::mousePressEvent(event);
+}
+
+void GameWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    // Оновлюємо розміри гри при будь-якій зміні розміру вікна
+    // Особливо важливо для fullscreen на Linux (X11/Wayland)
+    game.handleResize(event->size().width(), event->size().height());
+    update();
 }

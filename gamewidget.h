@@ -19,6 +19,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void handleQuitRequest();
@@ -33,6 +34,7 @@ private:
     long long lastFrameTime;
 
     QPixmap backgroundImage;
+    bool isFullscreen = false;
 };
 
 #endif // GAMEWIDGET_H

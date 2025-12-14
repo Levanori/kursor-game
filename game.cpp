@@ -117,18 +117,12 @@ void Game::handleMouseClick(const QPoint &pos)
         emit quitRequested();
     } else if (scale725Rect.contains(pos)) {
         emit requestWindowResize(QSize(725, 450));
-        isPaused = false;
-        clearPlayerKeys();
         qDebug() << "Resolution set to 725x450";
     } else if (scale1450Rect.contains(pos)) {
         emit requestWindowResize(QSize(1450, 900));
-        isPaused = false;
-        clearPlayerKeys();
         qDebug() << "Resolution set to 1450x900";
     } else if (scaleFullRect.contains(pos)) {
         emit requestFullscreen();
-        isPaused = false;
-        clearPlayerKeys();
         qDebug() << "Fullscreen requested";
     }
 }
