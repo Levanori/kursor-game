@@ -25,6 +25,7 @@ private slots:
     void handleQuitRequest();
     void handleWindowResize(QSize newSize);
     void handleFullscreenRequest();
+    void handleRestartRequest();
 
 private:
     Game game;

@@ -61,6 +61,9 @@ private:
     void enterFolder();
     void exitFolder();
     void clearEnemies();
+    
+    // Перевірка чи гравець у зоні ураження хвилі
+    bool isPlayerInWaveDangerZone() const;
 
     GameManager* m_gameManager = nullptr;
     
@@ -76,6 +79,7 @@ private:
     QPixmap m_attackCross1;
     QPixmap m_attackCross2;
     QPixmap m_currentAttack;
+    int m_currentAttackType = -1; // 0=top, 1=bottom, 2=cross1, 3=cross2
     double m_attackOpacity = 0.0;
     
 
@@ -97,6 +101,10 @@ private:
     double m_phaseTimer = 0.0;
     double m_enemySpawnTimer = 0.0;
     double m_spawnInterval = 2.0;
+    
+    // Таймер для рандомних хвиль
+    double m_randomWaveTimer = 0.0;
+    bool m_randomWaveActive = false;
     
 
     bool m_inFolder = false;

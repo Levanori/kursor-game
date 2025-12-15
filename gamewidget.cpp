@@ -14,6 +14,7 @@ GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
     connect(&game, &Game::quitRequested, this, &GameWidget::handleQuitRequest);
     connect(&game, &Game::requestWindowResize, this, &GameWidget::handleWindowResize);
     connect(&game, &Game::requestFullscreen, this, &GameWidget::handleFullscreenRequest);
+    connect(&game, &Game::restartRequested, this, &GameWidget::handleRestartRequest);
 
     gameTimerId = startTimer(16);
 
@@ -61,6 +62,12 @@ void GameWidget::handleFullscreenRequest()
 
     QSize currentSize = geometry().size();
     game.handleResize(currentSize.width(), currentSize.height());
+    update();
+}
+
+void GameWidget::handleRestartRequest()
+{
+    // Не змінюємо розмір вікна - зберігаємо поточний масштаб
     update();
 }
 
@@ -189,6 +196,7 @@ void GameWidget::timerEvent(QTimerEvent *event)
 void GameWidget::keyPressEvent(QKeyEvent *event)
 {
     if (!event->isAutoRepeat()) {
+        // Просто передаємо клавішу - масштаб зберігається
         game.handleKeyPress(event->key());
     }
     QWidget::keyPressEvent(event);

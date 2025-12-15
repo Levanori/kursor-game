@@ -31,6 +31,7 @@ signals:
     void quitRequested();
     void requestWindowResize(QSize newSize);
     void requestFullscreen();
+    void restartRequested();
 
 private:
     GameManager* gameManager;

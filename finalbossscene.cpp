@@ -69,6 +69,49 @@ void FinalBossScene::clearEnemies()
     m_folderProjectiles.clear();
 }
 
+// Перевірка чи гравець знаходиться в зоні ураження активної хвилі
+bool FinalBossScene::isPlayerInWaveDangerZone() const
+{
+    if (!player) return false;
+    if (m_attackOpacity <= 0.7) return false; // Урон тільки коли хвиля майже повністю видима
+    if (m_currentAttackType < 0) return false;
+    
+    QPointF playerCenter = player->getPosition() + QPointF(player->getSize().width()/2, player->getSize().height()/2);
+    double centerX = VIRTUAL_WIDTH / 2.0;
+    double centerY = VIRTUAL_HEIGHT / 2.0;
+    
+    // 0 = attack_top - верхня частина екрану (верхні 20%)
+    if (m_currentAttackType == 0) {
+        return playerCenter.y() < VIRTUAL_HEIGHT * 0.20;
+    }
+    
+    // 1 = attack_bottom - нижня частина екрану (нижні 20%)
+    if (m_currentAttackType == 1) {
+        return playerCenter.y() > VIRTUAL_HEIGHT * 0.80;
+    }
+    
+    // 2 = attack_cross1 - горизонтальна + вертикальна смуги (вузькі)
+    if (m_currentAttackType == 2) {
+        double horizontalWidth = 12.0;
+        double verticalWidth = 10.0;
+        bool inHorizontalBand = qAbs(playerCenter.y() - centerY) < horizontalWidth;
+        bool inVerticalBand = qAbs(playerCenter.x() - centerX) < verticalWidth;
+        return inHorizontalBand || inVerticalBand;
+    }
+    
+    // 3 = attack_cross2 - дві діагоналі під 45° (вузькі)
+    if (m_currentAttackType == 3) {
+        double crossWidth = 10.0;
+        double dx = playerCenter.x() - centerX;
+        double dy = playerCenter.y() - centerY;
+        double distToDiag1 = qAbs(dx - dy) / 1.414;
+        double distToDiag2 = qAbs(dx + dy) / 1.414;
+        return distToDiag1 < crossWidth || distToDiag2 < crossWidth;
+    }
+    
+    return false;
+}
+
 void FinalBossScene::spawnArenaProjectile()
 {
 
@@ -297,8 +340,8 @@ void FinalBossScene::updateIntroPhase(double deltaTime)
         m_phase = FinalBossPhase::Attack;
         m_phaseTimer = 0.0;
         
-        int attackType = QRandomGenerator::global()->bounded(4);
-        switch (attackType) {
+        m_currentAttackType = QRandomGenerator::global()->bounded(4);
+        switch (m_currentAttackType) {
         case 0: m_currentAttack = m_attackTop; break;
         case 1: m_currentAttack = m_attackBottom; break;
         case 2: m_currentAttack = m_attackCross1; break;
@@ -310,14 +353,41 @@ void FinalBossScene::updateIntroPhase(double deltaTime)
 void FinalBossScene::updateAttackPhase(double deltaTime)
 {
     m_phaseTimer += deltaTime;
-    m_attackOpacity = qMin(1.0, m_phaseTimer / 2.0);
+    // Швидше наростання прозорості атаки (0.8 сек)
+    m_attackOpacity = qMin(1.0, m_phaseTimer / 0.8);
     
-    if (m_phaseTimer >= 2.0) {
+    // Дозволяємо гравцю рухатись під час фази атаки
+    if (player) {
+        player->update(deltaTime);
+        
+        QPointF pos = player->getPosition();
+        QSizeF psize = player->getSize();
+        pos.setX(qBound(0.0, pos.x(), (double)VIRTUAL_WIDTH - psize.width()));
+        pos.setY(qBound(0.0, pos.y(), (double)VIRTUAL_HEIGHT - psize.height()));
+        player->setPosition(pos);
+        
+        if (player->isCrashed()) {
+            gameOver = true;
+            return;
+        }
+    }
+    
+    // Обробка урону та CPU Load від хвилі - ТІЛЬКИ якщо гравець у зоні
+    if (player && m_attackOpacity > 0.3 && isPlayerInWaveDangerZone()) {
+        player->increaseLoad(static_cast<int>(15 * deltaTime));
+        if (!player->isInvincible()) {
+            player->takeDamage(5);
+        }
+    }
+    
+    // Перехід до фази спавну вірусів після 3 секунд
+    if (m_phaseTimer >= 3.0) {
         m_phase = FinalBossPhase::SpawnViruses;
         m_phaseTimer = 0.0;
         m_attackOpacity = 1.0;
         
 
+        // Створюємо початкові снаряди
         for (int i = 0; i < 8; ++i) {
             spawnArenaProjectile();
         }
@@ -329,11 +399,11 @@ void FinalBossScene::updateSpawnPhase(double deltaTime)
 {
     m_phaseTimer += deltaTime;
     
-
+    // Оновлення ворогів та снарядів
     updateEnemies(deltaTime);
     updateProjectiles(deltaTime);
     
-
+    // Оновлення гравця
     if (player) {
         player->update(deltaTime);
         
@@ -348,7 +418,7 @@ void FinalBossScene::updateSpawnPhase(double deltaTime)
             return;
         }
         
-
+        // Перевірка взаємодії з папкою
         if (m_currentFolder.isActive && !m_currentFolder.isCompleted) {
             if (player->getBounds().intersects(m_currentFolder.bounds)) {
                 enterFolder();
@@ -359,21 +429,56 @@ void FinalBossScene::updateSpawnPhase(double deltaTime)
     
     checkCollisions();
     
-    m_attackOpacity = qMax(0.0, 1.0 - m_phaseTimer / 3.0);
+    // Згасання початкової атаки (якщо не активна рандомна хвиля)
+    if (!m_randomWaveActive) {
+        m_attackOpacity = qMax(0.0, 1.0 - m_phaseTimer / 8.0);
+    } else {
+        // Згасання рандомної хвилі
+        m_randomWaveTimer += deltaTime;
+        m_attackOpacity = qMax(0.0, 1.0 - m_randomWaveTimer / 5.0);
+        if (m_attackOpacity <= 0.01) {
+            m_randomWaveActive = false;
+            m_randomWaveTimer = 0.0;
+        }
+    }
     
-
+    // Спавн снарядів
     m_enemySpawnTimer += deltaTime;
     if (m_enemySpawnTimer >= 0.5 && m_projectiles.size() < 20) {
         m_enemySpawnTimer = 0.0;
         spawnArenaProjectile();
     }
+    
+    // Випадкова поява хвилі атаки під час фази спавну (1% шанс)
+    if (m_phaseTimer > 5.0 && !m_randomWaveActive && m_attackOpacity <= 0.1 && QRandomGenerator::global()->bounded(100) < 1) {
+        m_currentAttackType = QRandomGenerator::global()->bounded(4);
+        switch (m_currentAttackType) {
+        case 0: m_currentAttack = m_attackTop; break;
+        case 1: m_currentAttack = m_attackBottom; break;
+        case 2: m_currentAttack = m_attackCross1; break;
+        case 3: m_currentAttack = m_attackCross2; break;
+        }
+        m_attackOpacity = 1.0;
+        m_randomWaveActive = true;
+        m_randomWaveTimer = 0.0;
+    }
+    
+    // Обробка урону від хвилі атаки під час спавну - ТІЛЬКИ в зоні
+    if (player && m_attackOpacity > 0.3 && isPlayerInWaveDangerZone()) {
+        player->increaseLoad(static_cast<int>(10 * deltaTime));
+        if (!player->isInvincible()) {
+            player->takeDamage(5);
+        }
+    }
 }
 
 void FinalBossScene::updateFolderPhase(double deltaTime)
 {
+    // Оновлення ворогів та снарядів
     updateEnemies(deltaTime);
     updateProjectiles(deltaTime);
     
+    // Оновлення гравця
     if (player) {
         player->update(deltaTime);
         
@@ -391,14 +496,43 @@ void FinalBossScene::updateFolderPhase(double deltaTime)
     
     checkCollisions();
     
-
+    // Спавн ворогів
     m_folderEnemySpawnTimer += deltaTime;
     if (m_folderEnemySpawnTimer >= 1.5 && m_folderEnemies.size() < 8) {
         m_folderEnemySpawnTimer = 0.0;
         spawnEnemy();
     }
     
+    // Випадкова поява хвилі атаки під час фази папки (0.5% шанс)
+    if (!m_randomWaveActive && m_attackOpacity <= 0.1 && QRandomGenerator::global()->bounded(1000) < 5) {
+        m_currentAttackType = QRandomGenerator::global()->bounded(4);
+        switch (m_currentAttackType) {
+        case 0: m_currentAttack = m_attackTop; break;
+        case 1: m_currentAttack = m_attackBottom; break;
+        case 2: m_currentAttack = m_attackCross1; break;
+        case 3: m_currentAttack = m_attackCross2; break;
+        }
+        m_attackOpacity = 1.0;
+        m_randomWaveActive = true;
+        m_randomWaveTimer = 0.0;
+    }
+    
+    // Згасання хвилі атаки
+    if (m_randomWaveActive && m_attackOpacity > 0.01) {
+        m_randomWaveTimer += deltaTime;
+        m_attackOpacity = qMax(0.0, 1.0 - m_randomWaveTimer / 5.0);
+        if (m_attackOpacity <= 0.01) {
+            m_randomWaveActive = false;
+            m_randomWaveTimer = 0.0;
+        }
+        
+        // Обробка урону від хвилі під час фази папки (використовуємо спільну функцію)
+        if (isPlayerInWaveDangerZone()) {
+            player->increaseLoad(static_cast<int>(8 * deltaTime));
+        }
+    }
 
+    // Перевірка завершення папки
     if (m_currentFolder.currentScore >= m_currentFolder.scoreNeeded) {
         exitFolder();
     }
@@ -482,8 +616,8 @@ void FinalBossScene::exitFolder()
         qDeleteAll(m_projectiles);
         m_projectiles.clear();
         
-        int attackType = QRandomGenerator::global()->bounded(4);
-        switch (attackType) {
+        m_currentAttackType = QRandomGenerator::global()->bounded(4);
+        switch (m_currentAttackType) {
         case 0: m_currentAttack = m_attackTop; break;
         case 1: m_currentAttack = m_attackBottom; break;
         case 2: m_currentAttack = m_attackCross1; break;
@@ -588,6 +722,9 @@ void FinalBossScene::renderUI(QPainter& painter, double scaleFactor, double offs
     QString hint;
     if (m_phase == FinalBossPhase::Intro) {
         hint = "Prepare for the Final Boss!";
+    } else if (m_phase == FinalBossPhase::Attack) {
+        // Надпис під час хвилі атаки
+        hint = "INCOMING WAVE! Dodge the attack!";
     } else if (m_inFolder) {
         hint = QString("Kill viruses! %1/%2 points").arg(m_currentFolder.currentScore).arg(m_currentFolder.scoreNeeded);
     } else if (m_phase == FinalBossPhase::SpawnViruses) {
@@ -635,7 +772,10 @@ void FinalBossScene::onEnter()
     m_foldersCompleted = 0;
     m_inFolder = false;
     m_attackOpacity = 0.0;
+    m_currentAttackType = -1;
     m_enemySpawnTimer = 0.0;
+    m_randomWaveTimer = 0.0;
+    m_randomWaveActive = false;
     
     clearEnemies();
     
@@ -665,7 +805,10 @@ void FinalBossScene::reset()
     m_foldersCompleted = 0;
     m_inFolder = false;
     m_attackOpacity = 0.0;
+    m_currentAttackType = -1;
     m_enemySpawnTimer = 0.0;
+    m_randomWaveTimer = 0.0;
+    m_randomWaveActive = false;
     gameOver = false;
     sceneCompleted = false;
     score = 0;

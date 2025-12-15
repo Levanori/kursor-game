@@ -256,11 +256,7 @@ void BossScene::renderUI(QPainter& painter, double scaleFactor, double offsetX, 
 {
 
     renderBaseUI(painter, scaleFactor, offsetX, offsetY, "BOSS FIGHT");
-    
 
-    painter.setPen(Qt::white);
-    painter.setFont(QFont("Arial", 10));
-    painter.drawText(offsetX + 10, offsetY + VIRTUAL_HEIGHT * scaleFactor - 20, "← Back (ESC)");
 }
 
 void BossScene::renderBackground(QPainter& painter)

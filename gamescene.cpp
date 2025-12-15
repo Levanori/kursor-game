@@ -3,10 +3,14 @@
 
 GameScene::GameScene()
 {
+    // Ініціалізація розмірів екрану за замовчуванням
+    currentScreenWidth = VIRTUAL_WIDTH;
+    currentScreenHeight = VIRTUAL_HEIGHT;
 }
 
 void GameScene::handleResize(int w, int h)
 {
+    // Просто зберігаємо поточні розміри
     currentScreenWidth = w;
     currentScreenHeight = h;
 }

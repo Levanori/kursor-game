@@ -83,7 +83,7 @@ private:
     int totalScore = 0;
     int currentFolderIndex = -1;
 
-    const int SCORE_PER_FOLDER = 100;
+    const int SCORE_PER_FOLDER = 200;
 
     QVector<QPixmap> backgrounds;
 

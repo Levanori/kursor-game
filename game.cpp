@@ -106,6 +106,7 @@ void Game::handleMouseClick(const QPoint &pos)
         qDebug() << "Game Continued";
     } else if (restartRect.contains(pos)) {
         if (gameManager) {
+            emit restartRequested();
             gameManager->reset();
             isPaused = false;
             clearPlayerKeys();

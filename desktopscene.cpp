@@ -132,11 +132,16 @@ void DesktopScene::handleKeyPress(int key)
         if (key == Qt::Key_Space) {
 
             if (canInteractWithFolder && nearbyFolder) {
-
+                // Зберігаємо індекс папки ПЕРЕД скиданням
+                int folderIndex = nearbyFolder->getFolderIndex();
+                
+                // Скидаємо очки та приховуємо папки при вході в папку
+                resetScoreAndFolders();
+                
                 sceneCompleted = true;
                 result.completed = true;
                 result.nextScene = SceneType::Folder;
-                result.nextSceneIndex = nearbyFolder->getFolderIndex();
+                result.nextSceneIndex = folderIndex;
                 return;
             }
 
@@ -357,4 +362,17 @@ void DesktopScene::checkFolderInteraction()
             break;
         }
     }
+}
+
+void DesktopScene::resetScoreAndFolders()
+{
+    // Скидаємо очки при заході в папку
+    score = 0;
+    
+    // Видаляємо всі папки з екрану (вони з'являться знову при наборі очків)
+    qDeleteAll(folderIcons);
+    folderIcons.clear();
+    
+    nearbyFolder = nullptr;
+    canInteractWithFolder = false;
 }

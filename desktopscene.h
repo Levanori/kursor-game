@@ -31,6 +31,9 @@ public:
 
     void spawnFolderIcon(int folderIndex);
     
+    // Скидання очків та папок при заході в папку
+    void resetScoreAndFolders();
+    
 
     void removeFolderIcon(int folderIndex);
 

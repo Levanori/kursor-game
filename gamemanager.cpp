@@ -384,10 +384,15 @@ void GameManager::reset()
     for (auto* maze : mazeScenes) {
         maze->reset();
     }
+    if (finalBossScene) {
+        finalBossScene->reset();
+    }
 
     currentScene = desktopScene;
     previousScene = nullptr;
     if (currentScene) {
+        // Оновлюємо розміри сцени при рестарті (щоб масштаб був правильний)
+        currentScene->handleResize(screenWidth, screenHeight);
         currentScene->onEnter();
     }
 }
@@ -399,15 +404,22 @@ int GameManager::getScoreToUnlockFolder(int folderIndex) const
 
 void GameManager::checkFolderUnlock()
 {
-
+    // Перевіряємо розблокування папок тільки на Desktop сцені
+    if (!currentScene || currentScene->getType() != SceneType::Desktop) {
+        return;
+    }
+    
+    // Використовуємо очки з поточної сцени (Desktop)
+    int desktopScore = currentScene->getScore();
+    
     for (int i = 0; i < TOTAL_FOLDERS; ++i) {
-        if (!folderProgress[i].unlocked && totalScore >= getScoreToUnlockFolder(i)) {
-            unlockFolder(i);
-            
-
+        // Перевіряємо чи папка ще не завершена повністю і чи достатньо очків
+        if (!folderProgress[i].fullyCompleted && desktopScore >= getScoreToUnlockFolder(i)) {
+            // Спавнимо папку якщо її ще немає на екрані
             if (desktopScene) {
                 desktopScene->spawnFolderIcon(i);
             }
+            folderProgress[i].unlocked = true;
         }
     }
 }
