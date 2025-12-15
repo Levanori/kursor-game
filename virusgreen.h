@@ -15,16 +15,14 @@ protected:
 private:
     void loadSprites();
 
-    // Спрайти для різних станів HP
-    QPixmap spriteFull;   // 8 точок - 100% HP
-    QPixmap sprite7;      // 7 точок
-    QPixmap sprite5;      // 5 точок - ~50% HP
-    QPixmap sprite4;      // 4 точки
+    QPixmap spriteFull;
+    QPixmap sprite7;
+    QPixmap sprite5;
+    QPixmap sprite4;
 
-    // Спрайти для анімації смерті
-    QPixmap sprite3;      // 3 точки
-    QPixmap sprite2;      // 2 точки
-    QPixmap sprite1;      // 1 точка
+    QPixmap sprite3;
+    QPixmap sprite2;
+    QPixmap sprite1;
 };
 
-#endif // VIRUSGREEN_H
+#endif

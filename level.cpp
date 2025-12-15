@@ -6,7 +6,6 @@ Level::Level()
 {
     player = new Player(QPointF(400, 300), QSizeF(32, 32));
 
-    // Створюємо початкових ворогів
     for (int i = 0; i < 3; ++i) {
         spawnEnemy();
     }
@@ -26,23 +25,20 @@ void Level::update(double deltaTime)
     if (player) {
         accumulatedLoad += LOAD_PER_SECOND * deltaTime;
         if (accumulatedLoad >= 1.0) {
-            // Беремо цілу частину, на яку потрібно збільшити
+
             int loadIncrease = (int)accumulatedLoad;
 
-            // Збільшуємо навантаження гравця
             player->increaseLoad(loadIncrease);
 
-            // Залишаємо лише дробовий залишок для наступного кадру
             accumulatedLoad -= loadIncrease;
         }
     }
-    // Оновлення гравця
+
     player->update(deltaTime);
 
     QPointF pos = player->getPosition();
     QSizeF size = player->getSize();
 
-    // обмеження X та Y для гравця
     pos.setX(qBound(0.0, pos.x(), (double)VIRTUAL_WIDTH - size.width()));
     pos.setY(qBound(0.0, pos.y(), (double)VIRTUAL_HEIGHT - size.height()));
 
@@ -53,30 +49,25 @@ void Level::update(double deltaTime)
         return;
     }
 
-    // Оновлення ворогів
     for (Enemy* enemy : enemies) {
         enemy->update(deltaTime);
 
-        // Якщо це фіолетовий вірус - перевіряємо стрільбу
         VirusViolet* violet = dynamic_cast<VirusViolet*>(enemy);
         if (violet && violet->canShoot()) {
-            // Обчислюємо відстань до гравця
+
             QPointF enemyCenter = enemy->getPosition() + QPointF(enemy->getSize().width() / 2, enemy->getSize().height() / 2);
             QPointF playerCenter = player->getPosition() + QPointF(player->getSize().width() / 2, player->getSize().height() / 2);
             QPointF diff = playerCenter - enemyCenter;
             float distance = qSqrt(diff.x() * diff.x() + diff.y() * diff.y());
 
-            // Стріляємо якщо гравець на відстані 100-400 пікселів
             if (distance >= 100 && distance <= 400) {
                 spawnProjectile(violet);
             }
         }
     }
 
-    // Оновлення снарядів
     updateProjectiles(deltaTime);
 
-    // Видалення мертвих ворогів
     for (int i = enemies.size() - 1; i >= 0; --i) {
         if (enemies[i]->isDead()) {
             if (player) player->decreaseLoad(LOAD_PER_KILL);
@@ -86,10 +77,8 @@ void Level::update(double deltaTime)
         }
     }
 
-    // Перевірка колізій
     checkCollisions();
 
-    // Спавн нових ворогів
     spawnTimer += deltaTime;
     if (spawnTimer >= spawnInterval) {
         spawnTimer = 0;
@@ -99,17 +88,15 @@ void Level::update(double deltaTime)
 
 void Level::render(QPainter& painter)
 {
-    // Рендер снарядів
+
     for (Projectile* proj : projectiles) {
         proj->render(painter);
     }
 
-    // Рендер ворогів
     for (Enemy* enemy : enemies) {
         enemy->render(painter);
     }
 
-    // Рендер гравця
     player->render(painter);
 
 }
@@ -121,7 +108,6 @@ void Level::handleKeyPress(int key)
     }
     player->setKeyPressed(key, true);
 
-    // Атака пробілом
     if (key == Qt::Key_Space) {
         player->attack();
     }
@@ -143,20 +129,17 @@ void Level::checkCollisions()
 
         QRectF enemyBounds = enemy->getBounds();
 
-        // Атака гравця на ворога
         if (player->isAttacking() && attackBounds.intersects(enemyBounds)) {
             enemy->takeDamage(25);
             enemy->knockback(player->getPosition(), 200.0);
         }
 
-        // Ворог атакує гравця
         if (playerBounds.intersects(enemyBounds) && !player->isInvincible()) {
             player->takeDamage(enemy->getDamage());
             enemy->knockback(player->getPosition(), 150.0);
         }
     }
 
-    // Перевірка колізій снарядів з гравцем
     for (Projectile* proj : projectiles) {
         if (!proj->isActive()) continue;
 
@@ -170,30 +153,29 @@ void Level::checkCollisions()
 
 void Level::spawnEnemy()
 {
-    // Спавн на краю екрану
+
     double x, y;
     int edge = QRandomGenerator::global()->bounded(4);
 
     switch (edge) {
-    case 0: // Верх
+    case 0:
         x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
         y = -32;
         break;
-    case 1: // Право
+    case 1:
         x = VIRTUAL_WIDTH;
         y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
         break;
-    case 2: // Низ
+    case 2:
         x = QRandomGenerator::global()->bounded(VIRTUAL_WIDTH);
         y = VIRTUAL_HEIGHT;
         break;
-    default: // Ліво
+    default:
         x = -32;
         y = QRandomGenerator::global()->bounded(VIRTUAL_HEIGHT);
         break;
     }
 
-    // Випадково вибираємо тип ворога (70% зелені, 30% фіолетові)
     Enemy* enemy;
     if (QRandomGenerator::global()->bounded(100) < 70) {
         enemy = new VirusGreen(QPointF(x, y), QSizeF(32, 32));
@@ -206,7 +188,7 @@ void Level::spawnEnemy()
 
 void Level::renderUI(QPainter& painter, double scaleFactor, double offsetX, double offsetY)
 {
-    // CPU Bar
+
     int screenX = (int)(offsetX * scaleFactor);
     int screenY = (int)(offsetY * scaleFactor);
 
@@ -236,7 +218,6 @@ void Level::renderUI(QPainter& painter, double scaleFactor, double offsetX, doub
     painter.setFont(QFont("Arial", 12, QFont::Bold));
     painter.drawText(hpBarX + 5, hpBarY + 16, QString("CPU Load: %1%").arg(player->getCpuLoad()));
 
-    // Score
     painter.setPen(Qt::white);
     int scoreTextX = screenX + scaledW - 120;
     painter.drawText(scoreTextX, hpBarY + 16, QString("Score: %1").arg(score));
@@ -247,7 +228,6 @@ void Level::handleResize(int w, int h)
     currentScreenWidth = w;
     currentScreenHeight = h;
 }
-
 
 double Level::getScaleFactor() const
 {
@@ -280,12 +260,11 @@ void Level::reset()
 
 void Level::updateProjectiles(double deltaTime)
 {
-    // Оновлення снарядів
+
     for (Projectile* proj : projectiles) {
         proj->update(deltaTime);
     }
 
-    // Видалення неактивних снарядів
     for (int i = projectiles.size() - 1; i >= 0; --i) {
         if (!projectiles[i]->isActive() ||
             projectiles[i]->isOutOfBounds(QSizeF(VIRTUAL_WIDTH, VIRTUAL_HEIGHT))) {
@@ -297,19 +276,16 @@ void Level::updateProjectiles(double deltaTime)
 
 void Level::spawnProjectile(VirusViolet* shooter)
 {
-    // Позиція снаряду - центр ворога
+
     QPointF shooterCenter = shooter->getPosition() +
                             QPointF(shooter->getSize().width() / 2, shooter->getSize().height() / 2);
 
-    // Напрямок на гравця
     QPointF direction = shooter->getShootDirection(
         player->getPosition() + QPointF(player->getSize().width() / 2, player->getSize().height() / 2)
     );
 
-    // Стріляємо
     shooter->shoot();
 
-    // Створюємо снаряд
     Projectile* proj = new Projectile(shooterCenter, direction, 180.0);
     projectiles.append(proj);
 }

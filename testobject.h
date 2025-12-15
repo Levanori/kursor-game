@@ -15,4 +15,4 @@ private:
     double speed;
 };
 
-#endif // TESTOBJECT_H
+#endif

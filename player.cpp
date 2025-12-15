@@ -8,24 +8,22 @@ Player::Player(QPointF pos, QSizeF s)
     size = s;
     speed = 300.0;
 
-    // Завантаження спрайтів курсора (5 станів HP: 100, 80, 60, 40, 20)
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_100.png")); // 100 HP - цілий
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_80.png"));  // 80 HP
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_60.png"));  // 60 HP
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_40.png"));  // 40 HP
-    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_20.png"));  // 20 HP - найбільш пошкоджений
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_100.png"));
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_80.png"));
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_60.png"));
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_40.png"));
+    cursorSprites.append(QPixmap(":/sprites/assets/cursor/cursor_20.png"));
 
     updateSprite();
 }
 
 void Player::update(double deltaTime)
 {
-    // Оновлення таймера невразливості
+
     if (invincibilityTimer > 0) {
         invincibilityTimer -= deltaTime;
     }
 
-    // Оновлення атаки
     if (attacking) {
         attackTimer -= deltaTime;
         if (attackTimer <= 0) {
@@ -37,7 +35,6 @@ void Player::update(double deltaTime)
         attackCooldown -= deltaTime;
     }
 
-    // Керування рухом
     double velocityX = 0;
     double velocityY = 0;
 
@@ -51,7 +48,6 @@ void Player::update(double deltaTime)
     if (pressedKeys.contains(Qt::Key_D) || pressedKeys.contains(Qt::Key_Right) || pressedKeys.contains(QChar(0x0412).unicode()))
         velocityX = speed;
 
-    // Нормалізація діагонального руху
     if (velocityX != 0 && velocityY != 0) {
         double factor = 1.0 / qSqrt(2.0);
         velocityX *= factor;
@@ -65,7 +61,7 @@ void Player::update(double deltaTime)
 
 void Player::render(QPainter& painter)
 {
-    // Ефект миготіння при невразливості
+
     if (invincibilityTimer > 0) {
         int blinkPhase = (int)(invincibilityTimer * 10) % 2;
         if (blinkPhase == 0) {
@@ -76,7 +72,7 @@ void Player::render(QPainter& painter)
     if (!sprite.isNull()) {
         painter.drawPixmap(position.toPoint(), sprite.scaled(size.toSize()));
     } else {
-        // Fallback - білий курсор
+
         painter.setBrush(Qt::white);
         painter.setPen(Qt::black);
         QPolygonF cursor;
@@ -92,14 +88,12 @@ void Player::render(QPainter& painter)
 
     painter.setOpacity(1.0);
 
-    // Візуалізація атаки
     if (attacking) {
         painter.setBrush(QColor(255, 255, 0, 100));
         painter.setPen(Qt::NoPen);
         painter.drawEllipse(getAttackBounds());
     }
 
-    // Прогрес-бар cooldown'у атаки (над курсором)
     if (attackCooldown > 0) {
         double cooldownPercent = 1.0 - (attackCooldown / attackCooldownTime);
         double barWidth = 24;
@@ -107,16 +101,13 @@ void Player::render(QPainter& painter)
         double barX = position.x() + (size.width() - barWidth) / 2;
         double barY = position.y() - 10;
 
-        // Фон (сірий)
         painter.setBrush(QColor(60, 60, 60));
         painter.setPen(Qt::NoPen);
         painter.drawRect(QRectF(barX, barY, barWidth, barHeight));
 
-        // Заповнення (жовтий/помаранчевий)
         painter.setBrush(QColor(255, 180, 0));
         painter.drawRect(QRectF(barX, barY, barWidth * cooldownPercent, barHeight));
 
-        // Рамка
         painter.setPen(QPen(Qt::black, 1));
         painter.setBrush(Qt::NoBrush);
         painter.drawRect(QRectF(barX, barY, barWidth, barHeight));
@@ -156,6 +147,14 @@ void Player::decreaseLoad(int amount)
     if (cpuLoad < 0) {
         cpuLoad = 0;
     }
+    updateSprite();
+}
+
+void Player::setCpuLoad(int value)
+{
+    cpuLoad = value;
+    if (cpuLoad < 0) cpuLoad = 0;
+    if (cpuLoad > maxCpuLoad) cpuLoad = maxCpuLoad;
     updateSprite();
 }
 
@@ -201,7 +200,7 @@ void Player::clearKeys()
 
 void Player::updateSprite()
 {
-    // Вибір спрайту залежно від cpuLoad
+
     int spriteIndex = 0;
 
     if (cpuLoad > 80) {

@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/sprites">
-        <file>assets/desktop_background.svg</file>
+        <file>assets/backgrounds/desktop1_bg.svg</file>
+        <file>assets/backgrounds/folder1_bg.png</file>
+        <file>assets/backgrounds/folder2_bg.png</file>
+        <file>assets/backgrounds/folder3_bg.png</file>
         <file>assets/cursor/cursor_20.png</file>
         <file>assets/cursor/cursor_40.png</file>
         <file>assets/cursor/cursor_60.png</file>
@@ -21,5 +24,104 @@
         <file>assets/virus_violet/vv_8.png</file>
         <file>assets/virus_violet/vv_full.png</file>
         <file>assets/virus_violet/bombshell.png</file>
+        <file>assets/folderIcons/folder.png</file>
+        <file>assets/folderIcons/folder2.png</file>
+        <file>assets/folderIcons/folder3.png</file>
+    </qresource>
+    <qresource prefix="/backgrounds/neko">
+        <file alias="static_layer.png">assets/backgrounds/neko/static_layer.png</file>
+        <file alias="bottom_layer.png">assets/backgrounds/neko/bottom_layer.png</file>
+        <file alias="hands/0.png">assets/backgrounds/neko/hands/0.png</file>
+        <file alias="hands/1.png">assets/backgrounds/neko/hands/1.png</file>
+        <file alias="hands/2.png">assets/backgrounds/neko/hands/2.png</file>
+        <file alias="hands/3.png">assets/backgrounds/neko/hands/3.png</file>
+        <file alias="hands/4.png">assets/backgrounds/neko/hands/4.png</file>
+        <file alias="hands/5.png">assets/backgrounds/neko/hands/5.png</file>
+        <file alias="hands/6.png">assets/backgrounds/neko/hands/6.png</file>
+        <file alias="hands/7.png">assets/backgrounds/neko/hands/7.png</file>
+        <file alias="hands/8.png">assets/backgrounds/neko/hands/8.png</file>
+        <file alias="hands/9.png">assets/backgrounds/neko/hands/9.png</file>
+        <file alias="hands/10.png">assets/backgrounds/neko/hands/10.png</file>
+        <file alias="hands/11.png">assets/backgrounds/neko/hands/11.png</file>
+        <file alias="hands/12.png">assets/backgrounds/neko/hands/12.png</file>
+        <file alias="hands/13.png">assets/backgrounds/neko/hands/13.png</file>
+        <file alias="hands/14.png">assets/backgrounds/neko/hands/14.png</file>
+        <file alias="hands/15.png">assets/backgrounds/neko/hands/15.png</file>
+        <file alias="head/0.png">assets/backgrounds/neko/head/0.png</file>
+        <file alias="head/1.png">assets/backgrounds/neko/head/1.png</file>
+        <file alias="head/2.png">assets/backgrounds/neko/head/2.png</file>
+        <file alias="head/3.png">assets/backgrounds/neko/head/3.png</file>
+        <file alias="head/4.png">assets/backgrounds/neko/head/4.png</file>
+        <file alias="head/5.png">assets/backgrounds/neko/head/5.png</file>
+        <file alias="head/6.png">assets/backgrounds/neko/head/6.png</file>
+    </qresource>
+    <qresource prefix="/miniboss">
+        <file alias="window_upper.png">assets/miniboss/window_upper.png</file>
+        <file alias="window_lower.png">assets/miniboss/window_lower.png</file>
+        <file alias="cheekbone_1.png">assets/miniboss/cheekbone_1.png</file>
+        <file alias="cheekbone_2.png">assets/miniboss/cheekbone_2.png</file>
+        <file alias="boss_face.png">assets/miniboss/boss_face.png</file>
+        <file alias="boss_face_hit.png">assets/miniboss/boss_face_hit.png</file>
+        <file alias="boss_face_dead.png">assets/miniboss/boss_face_dead.png</file>
+        <file alias="hammer.png">assets/miniboss/hammer.png</file>
+        <file alias="hammer_attack.png">assets/miniboss/hammer_attack.png</file>
+        <file alias="attackWave_1.png">assets/miniboss/attackWave_1.png</file>
+        <file alias="attackWave_2.png">assets/miniboss/attackWave_2.png</file>
+    </qresource>
+    <qresource prefix="/maze">
+        <file alias="error_wall.png">assets/maze/error_wall.png</file>
+        <file alias="cross_close.png">assets/maze/cross_close.png</file>
+        <file alias="arrow_up.png">assets/maze/arrow_up.png</file>
+        <file alias="arrow_down.png">assets/maze/arrow_down.png</file>
+        <file alias="arrow_left.png">assets/maze/arrow_left.png</file>
+        <file alias="arrow_right.png">assets/maze/arrow_right.png</file>
+        <file alias="reload.png">assets/maze/reload.png</file>
+        <file alias="home.png">assets/maze/home.png</file>
+    </qresource>
+    <qresource prefix="/finalBoss">
+        <file alias="fb_0.png">assets/finalBoss/fb_0.png</file>
+        <file alias="fb_1.png">assets/finalBoss/fb_1.png</file>
+        <file alias="fb_2.png">assets/finalBoss/fb_2.png</file>
+        <file alias="fb_3.png">assets/finalBoss/fb_3.png</file>
+        <file alias="fb_4.png">assets/finalBoss/fb_4.png</file>
+        <file alias="fb_5.png">assets/finalBoss/fb_5.png</file>
+        <file alias="fb_6.png">assets/finalBoss/fb_6.png</file>
+        <file alias="fb_7.png">assets/finalBoss/fb_7.png</file>
+        <file alias="fb_8.png">assets/finalBoss/fb_8.png</file>
+        <file alias="fb_9.png">assets/finalBoss/fb_9.png</file>
+        <file alias="fb_10.png">assets/finalBoss/fb_10.png</file>
+        <file alias="fb_11.png">assets/finalBoss/fb_11.png</file>
+        <file alias="fb_12.png">assets/finalBoss/fb_12.png</file>
+        <file alias="fb_13.png">assets/finalBoss/fb_13.png</file>
+        <file alias="fb_14.png">assets/finalBoss/fb_14.png</file>
+        <file alias="fb_15.png">assets/finalBoss/fb_15.png</file>
+        <file alias="fb_16.png">assets/finalBoss/fb_16.png</file>
+        <file alias="fb_17.png">assets/finalBoss/fb_17.png</file>
+        <file alias="fb_18.png">assets/finalBoss/fb_18.png</file>
+        <file alias="fb_19.png">assets/finalBoss/fb_19.png</file>
+        <file alias="fb_20.png">assets/finalBoss/fb_20.png</file>
+        <file alias="fb_21.png">assets/finalBoss/fb_21.png</file>
+        <file alias="fb_22.png">assets/finalBoss/fb_22.png</file>
+        <file alias="fb_23.png">assets/finalBoss/fb_23.png</file>
+        <file alias="fb_24.png">assets/finalBoss/fb_24.png</file>
+        <file alias="fb_25.png">assets/finalBoss/fb_25.png</file>
+        <file alias="fb_26.png">assets/finalBoss/fb_26.png</file>
+        <file alias="fb_27.png">assets/finalBoss/fb_27.png</file>
+        <file alias="fb_28.png">assets/finalBoss/fb_28.png</file>
+        <file alias="fb_29.png">assets/finalBoss/fb_29.png</file>
+        <file alias="fb_30.png">assets/finalBoss/fb_30.png</file>
+        <file alias="fb_31.png">assets/finalBoss/fb_31.png</file>
+        <file alias="fb_32.png">assets/finalBoss/fb_32.png</file>
+        <file alias="fb_33.png">assets/finalBoss/fb_33.png</file>
+        <file alias="fb_34.png">assets/finalBoss/fb_34.png</file>
+        <file alias="fb_35.png">assets/finalBoss/fb_35.png</file>
+        <file alias="fb_36.png">assets/finalBoss/fb_36.png</file>
+        <file alias="fb_37.png">assets/finalBoss/fb_37.png</file>
+        <file alias="fb_38.png">assets/finalBoss/fb_38.png</file>
+        <file alias="fb_39.png">assets/finalBoss/fb_39.png</file>
+        <file alias="attack_top.png">assets/finalBoss/attack/attack_top.png</file>
+        <file alias="attack_bottom.png">assets/finalBoss/attack/attack_bottom.png</file>
+        <file alias="attack_cross1.png">assets/finalBoss/attack/attack_cross1.png</file>
+        <file alias="attack_cross2.png">assets/finalBoss/attack/attack_cross2.png</file>
     </qresource>
 </RCC>

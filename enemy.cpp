@@ -16,7 +16,7 @@ void Enemy::setTarget(QPointF* targetPos)
 
 void Enemy::update(double deltaTime)
 {
-    // Анімація смерті
+
     if (playingDeathAnimation) {
         deathAnimTimer += deltaTime;
         if (deathAnimTimer >= deathFrameDuration) {
@@ -31,20 +31,17 @@ void Enemy::update(double deltaTime)
         return;
     }
 
-    // Оновлення cooldown на отримання шкоди
     if (hitCooldown > 0) {
         hitCooldown -= deltaTime;
     }
 
-    // Обробка knockback
     if (knockbackTimer > 0) {
         knockbackTimer -= deltaTime;
         position += knockbackVelocity * deltaTime;
-        knockbackVelocity *= 0.9; // Затухання
+        knockbackVelocity *= 0.9;
         return;
     }
 
-    // Рух до цілі (гравця)
     if (targetPosition) {
         double dx = targetPosition->x() - position.x();
         double dy = targetPosition->y() - position.y();
@@ -67,12 +64,11 @@ void Enemy::render(QPainter& painter)
     if (!currentSprite.isNull()) {
         painter.drawPixmap(position.toPoint(), currentSprite.scaled(size.toSize()));
     } else {
-        // Fallback - червоний квадрат
+
         painter.setBrush(QBrush(Qt::red));
         painter.drawRect(QRectF(position, size));
     }
 
-    // Health bar (тільки якщо живий і не повне HP)
     if (!isDead() && health < maxHealth && !playingDeathAnimation) {
         double healthPercent = (double)health / maxHealth;
         painter.setBrush(Qt::red);
@@ -137,6 +133,6 @@ void Enemy::playDeathAnimation()
 
 void Enemy::onDeath()
 {
-    // Запускаємо анімацію смерті
+
     playDeathAnimation();
 }

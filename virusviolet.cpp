@@ -7,7 +7,7 @@ VirusViolet::VirusViolet(QPointF pos, QSizeF s)
 {
     maxHealth = 50;
     health = maxHealth;
-    speed = 60.0f;  // Повільніший ніж зелений, бо стріляє
+    speed = 60.0f;
     loadSprites();
     updateSprite();
 }
@@ -22,7 +22,6 @@ void VirusViolet::loadSprites()
     sprite2 = QPixmap(":/sprites/assets/virus_violet/vv_2.png");
     sprite1 = QPixmap(":/sprites/assets/virus_violet/vv_1.png");
 
-    // Налаштовуємо анімацію смерті
     deathAnimationSprites.clear();
     deathAnimationSprites.append(sprite4);
     deathAnimationSprites.append(sprite3);
@@ -36,12 +35,11 @@ void VirusViolet::loadSprites()
 
 void VirusViolet::update(double deltaTime)
 {
-    // Оновлюємо таймер стрільби
+
     if (shootTimer > 0) {
         shootTimer -= deltaTime;
     }
 
-    // Викликаємо базовий update
     Enemy::update(deltaTime);
 }
 
@@ -66,7 +64,7 @@ void VirusViolet::updateSprite()
 
 bool VirusViolet::canShoot() const
 {
-    // Може стріляти якщо кулдаун пройшов і є достатньо HP
+
     return shootTimer <= 0 && health > healthCostPerShot && !isPlayingDeathAnimation();
 }
 
@@ -75,7 +73,6 @@ QPointF VirusViolet::getShootDirection(QPointF targetPos) const
     QPointF center = position + QPointF(size.width() / 2, size.height() / 2);
     QPointF direction = targetPos - center;
 
-    // Нормалізуємо напрямок
     float length = qSqrt(direction.x() * direction.x() + direction.y() * direction.y());
     if (length > 0) {
         direction /= length;
@@ -88,14 +85,11 @@ void VirusViolet::shoot()
 {
     if (!canShoot()) return;
 
-    // Витрачаємо HP на постріл
     health -= healthCostPerShot;
     shootTimer = shootCooldown;
 
-    // Оновлюємо спрайт після втрати HP
     updateSprite();
 
-    // Перевіряємо чи не померли від пострілу
     if (health <= 0) {
         onDeath();
     }

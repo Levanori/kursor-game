@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include <QKeyEvent>
-#include "level.h"
+#include "gamemanager.h"
 
 class Game : public QObject
 {
@@ -20,8 +20,11 @@ public:
     void handleResize(int w, int h);
     void handleMouseClick(const QPoint& pos);
 
-    Level* getCurrentLevel() const { return currentLevel; }
+    GameManager* getGameManager() const { return gameManager; }
+    GameScene* getCurrentScene() const { return gameManager ? gameManager->getCurrentScene() : nullptr; }
     bool isitPaused() const { return isPaused; }
+    int getScreenWidth() const { return screenWidth; }
+    int getScreenHeight() const { return screenHeight; }
 
     void clearPlayerKeys();
 signals:
@@ -30,11 +33,11 @@ signals:
     void requestFullscreen();
 
 private:
-    Level* currentLevel;
+    GameManager* gameManager;
     bool isPaused;
     int screenWidth;
     int screenHeight;
 };
 
-#endif // GAME_H
+#endif
 

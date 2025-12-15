@@ -1,13 +1,13 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#include <QPainter> // тимчасово для малювання фігур
+#include <QPainter>
 
 class GameObject
 {
 public:
     virtual ~GameObject() = default;
-    virtual void update(double deltaTime) = 0; // оновлення об'єкта
+    virtual void update(double deltaTime) = 0;
     virtual void render(QPainter& painter) = 0;
 
     QPointF getPosition() {
@@ -23,4 +23,4 @@ protected:
     double speed = 0.0;
 };
 
-#endif // GAMEOBJECT_H
+#endif

@@ -1,19 +1,20 @@
 #include "game.h"
 #include <QDebug>
 
-Game::Game() : currentLevel(nullptr), isPaused(false)
+Game::Game() : isPaused(false), screenWidth(725), screenHeight(450)
 {
 
 }
 
 Game::~Game()
 {
-    delete currentLevel;
+    delete gameManager;
 }
 
 void Game::initialize()
 {
-    currentLevel = new Level();
+    gameManager = new GameManager();
+    gameManager->initialize();
 }
 
 void Game::update(double deltaTime)
@@ -22,24 +23,24 @@ void Game::update(double deltaTime)
         return;
     }
 
-    if (currentLevel) {
-        currentLevel->update(deltaTime);
+    if (gameManager) {
+        gameManager->update(deltaTime);
     }
 }
 
 void Game::render(QPainter& painter)
 {
-    if (currentLevel) {
-        currentLevel->render(painter);
+    if (gameManager) {
+        gameManager->render(painter);
     }
 }
 
 void Game::handleKeyPress(int key)
 {
     if (key == Qt::Key_Escape) {
-        Level* currentLevel = getCurrentLevel();
-        if (currentLevel && currentLevel->isGameOver()) {
-            currentLevel->reset();
+        GameScene* currentScene = getCurrentScene();
+        if (currentScene && currentScene->isGameOver()) {
+            gameManager->reset();
             return;
         }
         isPaused = !isPaused;
@@ -48,18 +49,18 @@ void Game::handleKeyPress(int key)
         return;
     }
 
-    if (isPaused) { // неможливість активувати скіли в паузі
+    if (isPaused) {
         return;
     }
-    if (currentLevel) {
-        currentLevel->handleKeyPress(key);
+    if (gameManager) {
+        gameManager->handleKeyPress(key);
     }
 }
 
 void Game::handleKeyRelease(int key)
 {
-    if (!isPaused && currentLevel) {
-        currentLevel->handleKeyRelease(key);
+    if (!isPaused && gameManager) {
+        gameManager->handleKeyRelease(key);
     }
 }
 
@@ -67,8 +68,8 @@ void Game::handleResize(int w, int h)
 {
     screenWidth = w;
     screenHeight = h;
-    if (currentLevel) {
-        currentLevel->handleResize(w, h);
+    if (gameManager) {
+        gameManager->handleResize(w, h);
     }
 }
 
@@ -84,30 +85,28 @@ void Game::handleMouseClick(const QPoint &pos)
     int spacing = 80;
 
     int leftColX = (w / 2) - buttonW - 20;
-    int rightColX = (w / 2) + 20; // Права колонка
+    int rightColX = (w / 2) + 20;
     int startY = h / 2 - 50;
-    // кнопка "Continue"
+
     QRect continueRect(leftColX, startY, buttonW, buttonH);
-    // кнопка "Restart"
+
     QRect restartRect(leftColX, startY + spacing, buttonW, buttonH);
-    // кнопка "Quit"
+
     QRect quitRect(leftColX, startY + 2 * spacing, buttonW, buttonH);
-    // 725x450
+
     QRect scale725Rect(rightColX, startY, buttonW, buttonH);
-    // 1450x900
+
     QRect scale1450Rect(rightColX, startY + spacing, buttonW, buttonH);
-    // Fullscreen
+
     QRect scaleFullRect(rightColX, startY + 2 * spacing, buttonW, buttonH);
 
-    Level* currentLevel = getCurrentLevel();
-    // перевірка, на яку кнопку клікнув користувач
     if (continueRect.contains(pos)) {
         isPaused = false;
         clearPlayerKeys();
         qDebug() << "Game Continued";
     } else if (restartRect.contains(pos)) {
-        if (currentLevel) {
-            currentLevel->reset();
+        if (gameManager) {
+            gameManager->reset();
             isPaused = false;
             clearPlayerKeys();
             qDebug() << "Game Restarted";
@@ -129,8 +128,8 @@ void Game::handleMouseClick(const QPoint &pos)
 
 void Game::clearPlayerKeys()
 {
-    if (currentLevel) {
-        currentLevel->clearPlayerKeys();
+    if (gameManager) {
+        gameManager->clearPlayerKeys();
     }
 }
 

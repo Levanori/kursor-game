@@ -20,14 +20,12 @@ void VirusGreen::loadSprites()
     sprite2 = QPixmap(":/sprites/assets/virus_green/vg_2.png");
     sprite1 = QPixmap(":/sprites/assets/virus_green/vg_1.png");
 
-    // Налаштовуємо анімацію смерті (4 -> 3 -> 2 -> 1)
     deathAnimationSprites.clear();
     deathAnimationSprites.append(sprite4);
     deathAnimationSprites.append(sprite3);
     deathAnimationSprites.append(sprite2);
     deathAnimationSprites.append(sprite1);
 
-    // Перевіряємо чи спрайти завантажились
     if (spriteFull.isNull()) {
         qDebug() << "Failed to load VirusGreen sprites!";
     }
@@ -36,25 +34,24 @@ void VirusGreen::loadSprites()
 void VirusGreen::updateSprite()
 {
     if (isPlayingDeathAnimation()) {
-        return; // Під час анімації смерті не змінюємо спрайт
+        return;
     }
 
     float healthPercent = (float)health / maxHealth * 100;
 
-    // Вибираємо спрайт залежно від HP
     if (healthPercent > 80) {
-        currentSprite = spriteFull;  // 8 точок
+        currentSprite = spriteFull;
     } else if (healthPercent > 60) {
-        currentSprite = sprite7;      // 7 точок
+        currentSprite = sprite7;
     } else if (healthPercent > 40) {
-        currentSprite = sprite5;      // 5 точок
+        currentSprite = sprite5;
     } else {
-        currentSprite = sprite4;      // 4 точки
+        currentSprite = sprite4;
     }
 }
 
 void VirusGreen::onDeath()
 {
-    // Запускаємо анімацію смерті
+
     playDeathAnimation();
 }

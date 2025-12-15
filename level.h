@@ -17,11 +17,9 @@ public:
     void update(double deltaTime);
     void render(QPainter& painter);
 
-    // Керування гравцем
     void handleKeyPress(int key);
     void handleKeyRelease(int key);
 
-    // Стан гри
     bool isGameOver() const { return gameOver; }
     int getScore() const { return score; }
 
@@ -47,14 +45,12 @@ private:
 
     const double LOAD_PER_SECOND = 2.0;
     const int LOAD_PER_KILL = 5;
-    double accumulatedLoad = 0.0; // щоб враховувалося автоматичне навантаження
+    double accumulatedLoad = 0.0;
     bool gameOver = false;
     int score = 0;
 
-    // Спавн ворогів
     double spawnTimer = 0;
     double spawnInterval = 2.0;
-
 
     const int VIRTUAL_WIDTH = 725;
     const int VIRTUAL_HEIGHT = 450;
@@ -62,4 +58,4 @@ private:
     int currentScreenHeight = VIRTUAL_HEIGHT;
 };
 
-#endif // LEVEL_H
+#endif

@@ -37,4 +37,4 @@ private:
     bool isFullscreen = false;
 };
 
-#endif // GAMEWIDGET_H
+#endif
