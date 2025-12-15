@@ -1,4 +1,11 @@
 <RCC>
+    <qresource prefix="/buttons">
+        <file alias="continue.png">assets/buttons/button_continue.png</file>
+        <file alias="restart.png">assets/buttons/button_restart.png</file>
+        <file alias="quit.png">assets/buttons/button_quit.png</file>
+        <file alias="scale.png">assets/buttons/button_scale.png</file>
+        <file alias="fullscreen.png">assets/buttons/button_fullscreen.png</file>
+    </qresource>
     <qresource prefix="/sprites">
         <file>assets/backgrounds/desktop1_bg.svg</file>
         <file>assets/backgrounds/folder1_bg.png</file>

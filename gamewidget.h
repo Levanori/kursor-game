@@ -36,6 +36,13 @@ private:
 
     QPixmap backgroundImage;
     bool isFullscreen = false;
+
+    QPixmap m_btnContinue;
+    QPixmap m_btnRestart;
+    QPixmap m_btnQuit;
+    QPixmap m_btnScale;
+    QPixmap m_btnFullscreen;
+    void loadButtonSprites();
 };
 
 #endif

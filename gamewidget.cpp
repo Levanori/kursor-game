@@ -1,5 +1,6 @@
 #include "gamewidget.h"
 #include <QResizeEvent>
+#include <QDebug>
 
 GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
 {
@@ -10,6 +11,7 @@ GameWidget::GameWidget(QWidget *parent) : QWidget(parent)
     setFocusPolicy(Qt::StrongFocus);
 
     backgroundImage = QPixmap(":/sprites/assets/backgrounds/desktop1_bg.svg");
+    loadButtonSprites();
 
     connect(&game, &Game::quitRequested, this, &GameWidget::handleQuitRequest);
     connect(&game, &Game::requestWindowResize, this, &GameWidget::handleWindowResize);
@@ -133,51 +135,46 @@ void GameWidget::paintEvent(QPaintEvent *event)
             painter.setPen(Qt::yellow);
             painter.drawText(0, h / 4 - 20, w, 30, Qt::AlignCenter, "WASD/Arrows - Move | SPACE - Attack | ESC - Continue");
 
-            painter.setFont(QFont("Arial", 22, QFont::Bold));
-            painter.setPen(Qt::black);
-            painter.setBrush(QColor(220, 220, 220, 255));
+            painter.setFont(QFont("Arial", 18, QFont::Bold));
             QColor textColor = Qt::black;
+            int textPaddingRight = 100;
 
             QRect continueRect(leftColX, h / 2 - 50, buttonW, buttonH);
-            painter.drawRect(continueRect);
+            painter.drawPixmap(continueRect, m_btnContinue.scaled(buttonW, buttonH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
             painter.setPen(textColor);
-            painter.drawText(continueRect, Qt::AlignCenter, "Continue (ESC)");
+            painter.drawText(continueRect.adjusted(0, 0, -textPaddingRight, 0), Qt::AlignCenter, "Continue (ESC)");
 
             QRect restartRect(leftColX, h / 2 - 50 + spacing, buttonW, buttonH);
-            painter.setPen(Qt::black); painter.setBrush(QColor(220, 220, 220, 255));
-            painter.drawRect(restartRect);
+            painter.drawPixmap(restartRect, m_btnRestart.scaled(buttonW, buttonH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
             painter.setPen(textColor);
-            painter.drawText(restartRect, Qt::AlignCenter, "Restart");
+            painter.drawText(restartRect.adjusted(0, 0, -textPaddingRight, 0), Qt::AlignCenter, "Restart");
 
             QRect quitRect(leftColX, h / 2 - 50 + 2 * spacing, buttonW, buttonH);
-            painter.setPen(Qt::black); painter.setBrush(QColor(220, 220, 220, 255));
-            painter.drawRect(quitRect);
+            painter.drawPixmap(quitRect, m_btnQuit.scaled(buttonW, buttonH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
             painter.setPen(textColor);
-            painter.drawText(quitRect, Qt::AlignCenter, "Quit");
+            painter.drawText(quitRect.adjusted(0, 0, -textPaddingRight, 0), Qt::AlignCenter, "Quit");
 
             int rightColX = (w / 2) + 20;
             painter.setPen(Qt::white);
             painter.setFont(QFont("Arial", 18, QFont::Bold));
             painter.drawText(QRect(rightColX, h / 2 - 90, buttonW, 30), Qt::AlignCenter, "Scale");
 
-            painter.setFont(QFont("Arial", 22, QFont::Bold));
-            painter.setPen(Qt::black);
-            painter.setBrush(QColor(220, 220, 220, 255));
+            painter.setFont(QFont("Arial", 18, QFont::Bold));
 
             QRect scale725Rect(rightColX, h / 2 - 50, buttonW, buttonH);
-            painter.drawRect(scale725Rect);
+            painter.drawPixmap(scale725Rect, m_btnScale.scaled(buttonW, buttonH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
             painter.setPen(textColor);
-            painter.drawText(scale725Rect, Qt::AlignCenter, "725x450");
+            painter.drawText(scale725Rect.adjusted(0, 0, -textPaddingRight, 0), Qt::AlignCenter, "725x450");
 
             QRect scale1450Rect(rightColX, h / 2 - 50 + spacing, buttonW, buttonH);
-            painter.drawRect(scale1450Rect);
+            painter.drawPixmap(scale1450Rect, m_btnScale.scaled(buttonW, buttonH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
             painter.setPen(textColor);
-            painter.drawText(scale1450Rect, Qt::AlignCenter, "1450x900");
+            painter.drawText(scale1450Rect.adjusted(0, 0, -textPaddingRight, 0), Qt::AlignCenter, "1450x900");
 
             QRect scaleFullRect(rightColX, h / 2 - 50 + 2 * spacing, buttonW, buttonH);
-            painter.drawRect(scaleFullRect);
+            painter.drawPixmap(scaleFullRect, m_btnFullscreen.scaled(buttonW, buttonH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
             painter.setPen(textColor);
-            painter.drawText(scaleFullRect, Qt::AlignCenter, "Fullscreen");
+            painter.drawText(scaleFullRect.adjusted(0, 0, -textPaddingRight, 0), Qt::AlignCenter, "Fullscreen");
         }
     }
 }
@@ -227,4 +224,19 @@ void GameWidget::resizeEvent(QResizeEvent *event)
 
     game.handleResize(event->size().width(), event->size().height());
     update();
+}
+
+void GameWidget::loadButtonSprites()
+{
+    m_btnContinue = QPixmap(":/buttons/continue.png");
+    m_btnRestart = QPixmap(":/buttons/restart.png");
+    m_btnQuit = QPixmap(":/buttons/quit.png");
+    m_btnScale = QPixmap(":/buttons/scale.png");
+    m_btnFullscreen = QPixmap(":/buttons/fullscreen.png");
+
+    if (m_btnContinue.isNull()) qDebug() << "Warning: Could not load continue button";
+    if (m_btnRestart.isNull()) qDebug() << "Warning: Could not load restart button";
+    if (m_btnQuit.isNull()) qDebug() << "Warning: Could not load quit button";
+    if (m_btnScale.isNull()) qDebug() << "Warning: Could not load scale button";
+    if (m_btnFullscreen.isNull()) qDebug() << "Warning: Could not load fullscreen button";
 }
